@@ -281,6 +281,30 @@ public class DownloadManager {
         MessageUtils.sendMessage(player, "обновление-проверка");
         // Здесь будет логика проверки и обновления
     }
+
+public void addCustomPlugin(Player player, String pluginName, String url, String description) {
+    FileConfiguration config = plugin.getConfigManager().getConfig();
+    
+    // Проверяем, нет ли уже плагина с таким именем
+    if (config.contains("библиотека-плагинов." + pluginName) || 
+        config.contains("кастомные-плагины." + pluginName)) {
+        MessageUtils.sendMessage(player, "плагин-уже-существует", new String[]{"плагин", pluginName});
+        return;
+    }
+    
+    // Добавляем в кастомные плагины
+    String path = "кастомные-плагины." + pluginName + ".";
+    config.set(path + "автор", "Пользователь");
+    config.set(path + "версия", "1.0.0");
+    config.set(path + "источник", "прямая-ссылка");
+    config.set(path + "описание", description);
+    config.set(path + "ссылка", url);
+    
+    // Сохраняем конфиг
+    plugin.getConfigManager().saveConfig();
+    
+    MessageUtils.sendMessage(player, "плагин-добавлен", new String[]{"плагин", pluginName});
+}
     
     public void checkAllUpdates(Player player) {
         MessageUtils.sendMessage(player, "обновление-проверка");
