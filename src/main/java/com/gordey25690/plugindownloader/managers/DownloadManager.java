@@ -23,15 +23,27 @@ public class DownloadManager {
     public void installPlugin(Player player, String pluginName) {
         FileConfiguration config = plugin.getConfigManager().getConfig();
         
-        if (!config.contains("библиотека-плагинов." + pluginName)) {
-            MessageUtils.sendMessage(player, "плагин-не-найден", new String[]{"плагин", pluginName});
-            return;
+        // Сначала проверяем в основной библиотеке
+        if (config.contains("библиотека-плагинов." + pluginName)) {
+            installFromLibrary(player, pluginName, "библиотека-плагинов");
         }
+        // Затем проверяем в кастомных плагинах
+        else if (config.contains("кастомные-плагины." + pluginName)) {
+            installFromLibrary(player, pluginName, "кастомные-плагины");
+        }
+        else {
+            MessageUtils.sendMessage(player, "плагин-не-найден", new String[]{"плагин", pluginName});
+        }
+    }
+    
+    private void installFromLibrary(Player player, String pluginName, String librarySection) {
+        FileConfiguration config = plugin.getConfigManager().getConfig();
+        String path = librarySection + "." + pluginName + ".";
         
-        String author = config.getString("библиотека-плагинов." + pluginName + ".автор");
-        String version = config.getString("библиотека-плагинов." + pluginName + ".версия");
-        String source = config.getString("библиотека-плагинов." + pluginName + ".источник");
-        String url = config.getString("библиотека-плагинов." + pluginName + ".ссылка");
+        String author = config.getString(path + "автор");
+        String version = config.getString(path + "версия");
+        String source = config.getString(path + "источник");
+        String url = config.getString(path + "ссылка");
         
         MessageUtils.sendMessage(player, "плагин-скачивается", new String[]{"плагин", pluginName});
         
@@ -44,6 +56,91 @@ public class DownloadManager {
         
         // Скачивание плагина
         downloadPlugin(player, pluginName, url, pluginFile);
+    }
+    
+    // Остальные методы остаются без изменений...
+    
+    public void showPluginList(Player player) {
+        FileConfiguration config = plugin.getConfigManager().getConfig();
+        
+        MessageUtils.sendMessage(player, "список-плагинов");
+        
+        boolean hasPlugins = false;
+        
+        // Основные плагины
+        if (config.contains("библиотека-плагинов")) {
+            player.sendMessage(MessageUtils.colorize("&6=== Основные плагины ==="));
+            for (String pluginName : config.getConfigurationSection("библиотека-плагинов").getKeys(false)) {
+                showPluginInfoLine(player, pluginName, "библиотека-плагинов");
+                hasPlugins = true;
+            }
+        }
+        
+        // Кастомные плагины
+        if (config.contains("кастомные-плагины")) {
+            player.sendMessage(MessageUtils.colorize("&6=== Кастомные плагины ==="));
+            for (String pluginName : config.getConfigurationSection("кастомные-плагинов").getKeys(false)) {
+                showPluginInfoLine(player, pluginName, "кастомные-плагины");
+                hasPlugins = true;
+            }
+        }
+        
+        if (!hasPlugins) {
+            player.sendMessage(MessageUtils.colorize("&cПлагины не найдены в библиотеке"));
+        }
+    }
+    
+    private void showPluginInfoLine(Player player, String pluginName, String librarySection) {
+        FileConfiguration config = plugin.getConfigManager().getConfig();
+        String path = librarySection + "." + pluginName + ".";
+        
+        String description = config.getString(path + "описание");
+        String version = config.getString(path + "версия");
+        
+        // Проверяем статус установки
+        File pluginFile = new File(pluginsFolder, pluginName + ".jar");
+        String status = pluginFile.exists() ? "&a✓" : "&c✗";
+        
+        String libraryIcon = librarySection.equals("библиотека-плагины") ? "&9★" : "&6☆";
+        
+        player.sendMessage(MessageUtils.colorize(" " + libraryIcon + " " + status + " &e" + pluginName + " &7v" + version + " &8- &f" + description));
+    }
+    
+    public void searchPlugins(Player player, String query) {
+        FileConfiguration config = plugin.getConfigManager().getConfig();
+        
+        MessageUtils.sendMessage(player, "поиск-результаты", new String[]{"запрос", query});
+        
+        boolean found = false;
+        
+        // Поиск в основных плагинах
+        if (config.contains("библиотека-плагинов")) {
+            for (String pluginName : config.getConfigurationSection("библиотека-плагинов").getKeys(false)) {
+                if (matchesSearch(pluginName, config.getString("библиотека-плагинов." + pluginName + ".описание", ""), query)) {
+                    showPluginInfoLine(player, pluginName, "библиотека-плагинов");
+                    found = true;
+                }
+            }
+        }
+        
+        // Поиск в кастомных плагинах
+        if (config.contains("кастомные-плагины")) {
+            for (String pluginName : config.getConfigurationSection("кастомные-плагины").getKeys(false)) {
+                if (matchesSearch(pluginName, config.getString("кастомные-плагины." + pluginName + ".описание", ""), query)) {
+                    showPluginInfoLine(player, pluginName, "кастомные-плагины");
+                    found = true;
+                }
+            }
+        }
+        
+        if (!found) {
+            player.sendMessage(MessageUtils.colorize(" &cПлагины не найдены по запросу: &e" + query));
+        }
+    }
+    
+    private boolean matchesSearch(String pluginName, String description, String query) {
+        return pluginName.toLowerCase().contains(query.toLowerCase()) ||
+               description.toLowerCase().contains(query.toLowerCase());
     }
     
     private void downloadPlugin(Player player, String pluginName, String urlString, File outputFile) {
