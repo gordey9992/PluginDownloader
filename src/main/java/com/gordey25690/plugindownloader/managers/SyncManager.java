@@ -2,7 +2,6 @@ package com.gordey25690.plugindownloader.managers;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import com.gordey25690.plugindownloader.PluginDownloader;
-import com.gordey25690.plugindownloader.utils.MessageUtils;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
@@ -74,4 +73,3 @@ public class SyncManager {
         return lastSyncTime;
     }
 }
-3. Обновляем Downlo
