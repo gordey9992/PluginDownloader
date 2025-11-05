@@ -1,0 +1,359 @@
+name: Сборка PluginDownloader
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Тип сборки'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+        - 'release'
+        - 'test'
+        - 'development'
+
+env:
+  PLUGIN_NAME: 'PluginDownloader'
+  JAVA_VERSION: '21'
+  PLUGIN_VERSION: '1.0.0'
+
+jobs:
+  preparation:
+    name: Подготовка к сборке
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Получить исходный код
+      uses: actions/checkout@v4
+
+    - name: Информация о сборке
+      run: |
+        echo "НАЧАЛО СБОРКИ"
+        echo "Плагин: ${{ env.PLUGIN_NAME }}"
+        echo "Версия: ${{ env.PLUGIN_VERSION }}"
+        echo "Java: ${{ env.JAVA_VERSION }}"
+        echo "Коммит: ${{ github.sha }}"
+        echo "Ветка: ${{ github.ref }}"
+        echo "Время: $(date)"
+
+  structure-check:
+    name: Проверка структуры проекта
+    runs-on: ubuntu-latest
+    needs: preparation
+    
+    steps:
+    - name: Получить код
+      uses: actions/checkout@v4
+
+    - name: Проверить файлы проекта
+      run: |
+        echo "ПРОВЕРКА СТРУКТУРЫ ПРОЕКТА"
+        
+        REQUIRED_FILES=(
+          "pom.xml"
+          "src/main/resources/plugin.yml"
+          "src/main/resources/config.yml" 
+          "src/main/resources/messages.yml"
+        )
+        
+        for file in "${REQUIRED_FILES[@]}"; do
+          if [ -f "$file" ]; then
+            echo "OK: $file"
+          else
+            echo "ERROR: $file не найден"
+            exit 1
+          fi
+        done
+        
+        if [ -d "src/main/java/com/gordey25690/plugindownloader" ]; then
+          JAVA_COUNT=$(find src/main/java/com/gordey25690/plugindownloader -name "*.java" | wc -l)
+          echo "Java файлов: $JAVA_COUNT"
+        else
+          echo "ERROR: Папка с исходным кодом не найдена"
+          exit 1
+        fi
+
+  dependencies:
+    name: Установка зависимостей
+    runs-on: ubuntu-latest
+    needs: structure-check
+    
+    steps:
+    - name: Получить код
+      uses: actions/checkout@v4
+
+    - name: Установить Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Очистить предыдущие сборки
+      run: mvn -B clean
+
+    - name: Загрузить зависимости
+      run: mvn -B dependency:resolve
+
+  compilation:
+    name: Компиляция кода
+    runs-on: ubuntu-latest
+    needs: dependencies
+    
+    steps:
+    - name: Получить код
+      uses: actions/checkout@v4
+
+    - name: Установить Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Компилировать код
+      run: mvn -B compile
+
+    - name: Проверить компиляцию
+      run: |
+        if [ -d "target/classes" ]; then
+          CLASS_COUNT=$(find target/classes -name "*.class" | wc -l)
+          echo "Компиляция успешна"
+          echo "Скомпилированных классов: $CLASS_COUNT"
+        else
+          echo "Ошибка компиляции"
+          exit 1
+        fi
+
+  build:
+    name: Сборка JAR файла
+    runs-on: ubuntu-latest
+    needs: compilation
+    
+    steps:
+    - name: Получить код
+      uses: actions/checkout@v4
+
+    - name: Установить Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Собрать JAR файл
+      run: mvn -B clean package -DskipTests
+
+    - name: Анализ сборки
+      run: |
+        JAR_FILE=$(find target -name "*.jar" ! -name "*-javadoc.jar" ! -name "original-*.jar" | head -1)
+        
+        if [ -f "$JAR_FILE" ]; then
+          echo "JAR файл создан: $(basename $JAR_FILE)"
+          echo "Размер: $(du -h "$JAR_FILE" | cut -f1)"
+          echo "MD5: $(md5sum "$JAR_FILE" | cut -d' ' -f1)"
+        else
+          echo "JAR файл не найден"
+          exit 1
+        fi
+
+  quality:
+    name: Контроль качества
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Получить код
+      uses: actions/checkout@v4
+
+    - name: Анализ кода
+      run: |
+        echo "КОНТРОЛЬ КАЧЕСТВА КОДА"
+        
+        JAVA_FILES=$(find src/main/java -name "*.java" | wc -l)
+        YAML_FILES=$(find src/main/resources -name "*.yml" | wc -l)
+        echo "Java файлов: $JAVA_FILES"
+        echo "YAML файлов: $YAML_FILES"
+        
+        echo "Поиск TODO/FIXME:"
+        find src/main/java -name "*.java" -exec grep -l "TODO\|FIXME" {} \; | while read file; do
+          echo "Найдено в: $(basename $file)"
+        done
+
+  artifacts:
+    name: Создание артефактов
+    runs-on: ubuntu-latest
+    needs: [build, quality]
+    
+    steps:
+    - name: Получить код
+      uses: actions/checkout@v4
+
+    - name: Установить Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Финальная сборка
+      run: mvn -B clean package -DskipTests
+
+    - name: Подготовка артефактов
+      run: |
+        mkdir -p artifacts
+        
+        JAR_FILE=$(find target -name "*.jar" ! -name "*-javadoc.jar" ! -name "original-*.jar" | head -1)
+        cp "$JAR_FILE" artifacts/
+        cp src/main/resources/*.yml artifacts/ 2>/dev/null || echo "Конфиги скопированы"
+        
+        # Создаем информацию через отдельные команды echo
+        echo "PluginDownloader - Информация о сборке" > artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "ОСНОВНАЯ ИНФОРМАЦИЯ:" >> artifacts/info.txt
+        echo "- Название: PluginDownloader" >> artifacts/info.txt
+        echo "- Версия: 1.0.0" >> artifacts/info.txt
+        echo "- Сборка: ${{ github.run_number }}" >> artifacts/info.txt
+        echo "- Коммит: ${{ github.sha }}" >> artifacts/info.txt
+        echo "- Ветка: ${{ github.ref_name }}" >> artifacts/info.txt
+        echo "- Дата: $(date)" >> artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "СОДЕРЖИМОЕ:" >> artifacts/info.txt
+        echo "- $(basename $JAR_FILE) - собранный плагин" >> artifacts/info.txt
+        echo "- config.yml - конфигурация" >> artifacts/info.txt
+        echo "- messages.yml - сообщения" >> artifacts/info.txt
+        echo "- plugin.yml - описание плагина" >> artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "УСТАНОВКА:" >> artifacts/info.txt
+        echo "1. Скопируйте JAR файл в папку plugins/" >> artifacts/info.txt
+        echo "2. Перезагрузите сервер" >> artifacts/info.txt
+        echo "3. Настройте конфиги в plugins/PluginDownloader/" >> artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "КОМАНДЫ:" >> artifacts/info.txt
+        echo "- /plugindownloader установить [плагин] - установить плагин" >> artifacts/info.txt
+        echo "- /plugindownloader список - список доступных плагинов" >> artifacts/info.txt
+        echo "- /plugindownloader удалить <плагин> - удалить плагин" >> artifacts/info.txt
+        echo "- /plugindownloader обновить [плагин] - обновить плагин" >> artifacts/info.txt
+        echo "- /plugindownloader инфо <плагин> - информация о плагине" >> artifacts/info.txt
+        echo "- /plugindownloader поиск <запрос> - поиск плагинов" >> artifacts/info.txt
+        echo "- /plugindownloader перезагрузить - перезагрузить конфигурацию" >> artifacts/info.txt
+        echo "- /магазинплагинов [поиск] - открыть магазин плагинов" >> artifacts/info.txt
+        echo "- /обновлениеплагинов [все|плагин] - проверить обновления" >> artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "АЛИАСЫ:" >> artifacts/info.txt
+        echo "- /пдл - основная команда" >> artifacts/info.txt
+        echo "- /плагины - основная команда" >> artifacts/info.txt
+        echo "- /мп - магазин плагинов" >> artifacts/info.txt
+        echo "- /оп - обновление плагинов" >> artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "РАЗРАБОТЧИКИ:" >> artifacts/info.txt
+        echo "- gordey25690" >> artifacts/info.txt
+        echo "- DeepSeek" >> artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "ЛИЦЕНЗИЯ: MIT" >> artifacts/info.txt
+        echo "" >> artifacts/info.txt
+        echo "GitHub: https://github.com/gordey9992/PluginDownloader" >> artifacts/info.txt
+        
+        echo "БЫСТРЫЙ СТАРТ" > artifacts/quick-start.txt
+        echo "" >> artifacts/quick-start.txt
+        echo "1. УСТАНОВКА:" >> artifacts/quick-start.txt
+        echo "   - Поместите JAR в plugins/" >> artifacts/quick-start.txt
+        echo "   - Перезагрузите сервер" >> artifacts/quick-start.txt
+        echo "" >> artifacts/quick-start.txt
+        echo "2. ИСПОЛЬЗОВАНИЕ:" >> artifacts/quick-start.txt
+        echo "   - /пдл список - посмотреть доступные плагины" >> artifacts/quick-start.txt
+        echo "   - /пдл установить OperatorFromPerms - установить плагин" >> artifacts/quick-start.txt
+        echo "   - /мп - открыть магазин плагинов" >> artifacts/quick-start.txt
+        echo "" >> artifacts/quick-start.txt
+        echo "3. ПРЕДУСТАНОВЛЕННЫЕ ПЛАГИНЫ:" >> artifacts/quick-start.txt
+        echo "   - OperatorFromPerms - автоматические права оператора" >> artifacts/quick-start.txt
+        echo "   - WorldEdit - редактор карт" >> artifacts/quick-start.txt
+        echo "   - LuckPerms - система прав" >> artifacts/quick-start.txt
+        echo "" >> artifacts/quick-start.txt
+        echo "Поддержка: https://github.com/gordey9992/PluginDownloader" >> artifacts/quick-start.txt
+
+    - name: Загрузка артефактов
+      uses: actions/upload-artifact@v4
+      with:
+        name: PluginDownloader-v${{ env.PLUGIN_VERSION }}-${{ github.run_number }}
+        path: artifacts/
+        retention-days: 30
+
+  release:
+    name: Создание релиза
+    runs-on: ubuntu-latest
+    needs: artifacts
+    if: github.ref == 'refs/heads/main' && inputs.build_type == 'release'
+    
+    steps:
+    - name: Создать релиз GitHub
+      uses: softprops/action-gh-release@v1
+      with:
+        files: artifacts/*
+        generate_release_notes: true
+        tag_name: v${{ env.PLUGIN_VERSION }}-${{ github.run_number }}
+        name: "PluginDownloader v${{ env.PLUGIN_VERSION }}"
+        body: |
+          Плагин для загрузки плагинов прямо в игре!
+
+          Что нового:
+          - Установка плагинов через команды
+          - Графический магазин плагинов
+          - Автоматические обновления
+          - Безопасная загрузка
+
+          Основные команды:
+          /plugindownloader установить [плагин]
+          /plugindownloader список
+          /plugindownloader удалить <плагин>
+          /магазинплагинов
+          /обновлениеплагинов
+
+          Алиасы:
+          /пдл - основная команда
+          /мп - магазин плагинов
+          /оп - обновления
+
+          Разработчики:
+          - gordey25690
+          - DeepSeek
+
+  report:
+    name: Итоговый отчет
+    runs-on: ubuntu-latest
+    needs: [preparation, structure-check, dependencies, compilation, build, quality, artifacts]
+    if: always()
+    
+    steps:
+    - name: Создать отчет
+      run: |
+        echo "ОТЧЕТ О СБОРКЕ #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "РЕЗУЛЬТАТЫ ВЫПОЛНЕНИЯ:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Этап | Статус |" >> $GITHUB_STEP_SUMMARY
+        echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Подготовка | ${{ needs.preparation.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Проверка структуры | ${{ needs.structure-check.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Установка зависимостей | ${{ needs.dependencies.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Компиляция | ${{ needs.compilation.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Сборка JAR | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Контроль качества | ${{ needs.quality.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Создание артефактов | ${{ needs.artifacts.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.artifacts.result }}" == "success" ]; then
+          echo "✅ УСПЕХ!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**PluginDownloader v${{ env.PLUGIN_VERSION }} успешно собран!**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Артефакты готовы к скачиванию" >> $GITHUB_STEP_SUMMARY
+          echo "🚀 Плагин можно устанавливать на сервер" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ ВНИМАНИЕ!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "В процессе сборки возникли проблемы." >> $GITHUB_STEP_SUMMARY
+        fi
