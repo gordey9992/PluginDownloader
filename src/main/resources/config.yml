@@ -64,3 +64,21 @@
   сохранять-резервные-копии: true
   максимальное-количество-копий: 5
   папка-резервных-копий: "plugins/PluginDownloader/backups"
+
+библиотека-плагинов:
+  OperatorFromPerms:
+    автор: "gordey9992"
+    версия: "2.0.0"
+    источник: "github"
+    описание: "Автоматически выдает права оператора"
+    ссылка: "https://github.com/gordey9992/OperatorFromPerms/releases/download/v2.0.0/OperatorFromPerms-2.0.0.jar"
+
+# НОВЫЙ РАЗДЕЛ для кастомных плагинов
+кастомные-плагины:
+  # Пример кастомного плагина
+  MyCustomPlugin:
+    автор: "CustomAuthor"
+    версия: "1.0.0"
+    источник: "прямая-ссылка"
+    описание: "Мой кастомный плагин"
+    ссылка: "https://example.com/MyCustomPlugin.jar"
