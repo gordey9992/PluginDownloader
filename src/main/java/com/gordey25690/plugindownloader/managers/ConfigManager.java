@@ -38,6 +38,11 @@ public class ConfigManager {
         reloadConfig();
     }
     
+    // ДОБАВЛЯЕМ ЭТОТ МЕТОД
+    public void loadConfig() {
+        reloadConfig();
+    }
+    
     public void reloadConfig() {
         config = YamlConfiguration.loadConfiguration(configFile);
         messages = YamlConfiguration.loadConfiguration(messagesFile);
