@@ -20,21 +20,48 @@ public class DownloadManager {
         this.pluginsFolder = new File("plugins");
     }
     
-    public void installPlugin(Player player, String pluginName) {
-        FileConfiguration config = plugin.getConfigManager().getConfig();
-        
-        // Сначала проверяем в основной библиотеке
-        if (config.contains("библиотека-плагинов." + pluginName)) {
-            installFromLibrary(player, pluginName, "библиотека-плагинов");
-        }
-        // Затем проверяем в кастомных плагинах
-        else if (config.contains("кастомные-плагины." + pluginName)) {
-            installFromLibrary(player, pluginName, "кастомные-плагины");
-        }
-        else {
-            MessageUtils.sendMessage(player, "плагин-не-найден", new String[]{"плагин", pluginName});
-        }
+public void installPlugin(Player player, String pluginName) {
+    FileConfiguration config = plugin.getConfigManager().getConfig();
+    YamlConfiguration sharedPlugins = plugin.getSyncManager().getSharedPlugins();
+    
+    // Сначала проверяем в общих плагинах (GitHub)
+    if (sharedPlugins.contains("общие-плагины." + pluginName)) {
+        installFromSharedLibrary(player, pluginName, sharedPlugins);
     }
+    // Затем в основной библиотеке
+    else if (config.contains("библиотека-плагинов." + pluginName)) {
+        installFromLibrary(player, pluginName, "библиотека-плагинов");
+    }
+    // Затем в кастомных плагинах
+    else if (config.contains("кастомные-плагины." + pluginName)) {
+        installFromLibrary(player, pluginName, "кастомные-плагины");
+    }
+    else {
+        MessageUtils.sendMessage(player, "плагин-не-найден", new String[]{"плагин", pluginName});
+    }
+}
+
+private void installFromSharedLibrary(Player player, String pluginName, YamlConfiguration sharedPlugins) {
+    String path = "общие-плагины." + pluginName + ".";
+    
+    String author = sharedPlugins.getString(path + "автор");
+    String version = sharedPlugins.getString(path + "версия");
+    String source = sharedPlugins.getString(path + "источник");
+    String url = sharedPlugins.getString(path + "ссылка");
+    String description = sharedPlugins.getString(path + "описание");
+    
+    MessageUtils.sendMessage(player, "плагин-скачивается", new String[]{"плагин", pluginName});
+    
+    // Проверка если плагин уже установлен
+    File pluginFile = new File(pluginsFolder, pluginName + ".jar");
+    if (pluginFile.exists()) {
+        MessageUtils.sendMessage(player, "плагин-уже-установлен", new String[]{"плагин", pluginName});
+        return;
+    }
+    
+    // Скачивание плагина
+    downloadPlugin(player, pluginName, url, pluginFile);
+}
     
     private void installFromLibrary(Player player, String pluginName, String librarySection) {
         FileConfiguration config = plugin.getConfigManager().getConfig();
