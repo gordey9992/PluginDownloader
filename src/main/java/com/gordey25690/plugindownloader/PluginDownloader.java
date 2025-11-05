@@ -32,7 +32,7 @@ public class PluginDownloader extends JavaPlugin {
         getCommand("обновлениеплагинов").setTabCompleter(new TabComplete());
         
         // Загрузка конфигурации
-        configManager.loadConfig();
+        configManager.reloadConfig();
         
         getLogger().info("PluginDownloader успешно запущен!");
         getLogger().info("Авторы: gordey25690 & DeepSeek");
