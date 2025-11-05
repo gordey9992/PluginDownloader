@@ -1,6 +1,9 @@
 # Конфигурация PluginDownloader
 настройки:
   авто-проверка-обновлений: true
+  авто-синхронизация: true
+  интервал-синхронизации: 3600
+  url-общих-плагинов: "https://raw.githubusercontent.com/gordey9992/PluginDownloader/main/shared_plugins.yml"
   резервная-копия-перед-обновлением: true
   максимальный-размер-файла-мб: 50
   таймаут-загрузки: 30
