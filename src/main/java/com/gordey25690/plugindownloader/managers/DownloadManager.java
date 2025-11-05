@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.configuration.file.FileConfiguration;
 import com.gordey25690.plugindownloader.PluginDownloader;
 import com.gordey25690.plugindownloader.utils.MessageUtils;
+import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.*;
 import java.net.URL;
 import java.net.HttpURLConnection;
