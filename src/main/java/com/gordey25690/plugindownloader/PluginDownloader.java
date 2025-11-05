@@ -58,4 +58,7 @@ public class PluginDownloader extends JavaPlugin {
     public ConfigManager getConfigManager() {
         return configManager;
     }
+public SyncManager getSyncManager() {
+    return syncManager;
+}
 }
