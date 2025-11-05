@@ -1,0 +1,56 @@
+name: PluginDownloader
+version: 1.0.0
+main: com.gordey25690.plugindownloader.PluginDownloader
+api-version: "1.21"
+author: gordey25690 & DeepSeek
+description: Скачивание и управление плагинами прямо в игре
+website: https://github.com/gordey9992
+commands:
+  plugindownloader:
+    description: Основная команда для загрузки плагинов
+    usage: /<command> <установить|список|удалить|обновить|перезагрузить|инфо|поиск>
+    aliases: [пдл, плагины, управлениеплагинами]
+  магазинплагинов:
+    description: Просмотр доступных плагинов
+    usage: /<command> [поиск]
+    aliases: [мп, магазин]
+  обновлениеплагинов:
+    description: Проверка обновлений плагинов
+    usage: /<command> [все|название_плагина]
+    aliases: [оп, обновить]
+permissions:
+  plugindownloader.*:
+    description: Все разрешения для PluginDownloader
+    children:
+      plugindownloader.use: true
+      plugindownloader.install: true
+      plugindownloader.remove: true
+      plugindownloader.update: true
+      plugindownloader.reload: true
+      plugindownloader.manage: true
+      plugindownloader.shop: true
+      plugindownloader.info: true
+  plugindownloader.use:
+    description: Использование PluginDownloader
+    default: op
+  plugindownloader.install:
+    description: Установка плагинов
+    default: op
+  plugindownloader.remove:
+    description: Удаление плагинов
+    default: op
+  plugindownloader.update:
+    description: Обновление плагинов
+    default: op
+  plugindownloader.reload:
+    description: Перезагрузка конфигурации
+    default: op
+  plugindownloader.manage:
+    description: Управление плагинами
+    default: op
+  plugindownloader.shop:
+    description: Доступ к магазину плагинов
+    default: op
+  plugindownloader.info:
+    description: Просмотр информации о плагинах
+    default: op

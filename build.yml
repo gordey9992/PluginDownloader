@@ -1,0 +1,25 @@
+name: PluginDownloader
+version: 1.0.0
+main: com.gordey25690.plugindownloader.PluginDownloader
+api-version: "1.21"
+loader: java
+target: 21
+libraries:
+  - "com.fasterxml.jackson.core:jackson-core:2.15.2"
+  - "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+  - "org.apache.httpcomponents:httpclient:4.5.14"
+build:
+  source: 21
+  target: 21
+  encoding: UTF-8
+  output: target/PluginDownloader.jar
+  resources:
+    - "src/main/resources"
+  plugins:
+    - compiler
+    - shade
+authors:
+  - "gordey25690"
+  - "DeepSeek"
+description: "Скачивание и управление плагинами прямо в игре"
+website: "https://github.com/gordey9992"

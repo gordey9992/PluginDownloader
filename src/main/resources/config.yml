@@ -1,0 +1,66 @@
+# Конфигурация PluginDownloader
+настройки:
+  авто-проверка-обновлений: true
+  резервная-копия-перед-обновлением: true
+  максимальный-размер-файла-мб: 50
+  таймаут-загрузки: 30
+  разрешенные-источники:
+    - "github"
+    - "прямая-ссылка"
+    - "jenkins"
+    - "custom"
+
+# Доступные источники плагинов
+источники:
+  github: "https://github.com/{автор}/{плагин}/releases/download/{версия}/{плагин}-{версия}.jar"
+  прямая-ссылка: "{ссылка}"
+  jenkins: "{jenkins_url}/lastSuccessfulBuild/artifact/{путь_артефакта}"
+  custom: "{custom_url}"
+
+# Библиотека предустановленных плагинов
+библиотека-плагинов:
+  OperatorFromPerms:
+    автор: "gordey9992"
+    версия: "2.0.0"
+    источник: "github"
+    описание: "Автоматически выдает права оператора на основе разрешений"
+    ссылка: "https://github.com/gordey9992/OperatorFromPerms/releases/download/v2.0.0/OperatorFromPerms-2.0.0.jar"
+  WorldEdit:
+    автор: "EngineHub"
+    версия: "7.2.15"
+    источник: "github"
+    описание: "Мощный редактор карт в игре"
+    ссылка: "https://github.com/EngineHub/WorldEdit/releases/download/7.2.15/worldedit-bukkit-7.2.15.jar"
+  LuckPerms:
+    автор: "Luck"
+    версия: "5.4.87"
+    источник: "github"
+    описание: "Плагин прав для серверов Minecraft"
+    ссылка: "https://github.com/LuckPerms/LuckPerms/releases/download/5.4.87/LuckPerms-Bukkit-5.4.87.jar"
+
+# Настройки интерфейса
+интерфейс:
+  предметов-на-страницу: 9
+  включить-анимации: true
+  авто-обновление: true
+
+# Настройки безопасности
+безопасность:
+  проверять-подписи: false
+  разрешенные-домены:
+    - "github.com"
+    - "githubusercontent.com"
+    - "jenkins.io"
+    - "spigotmc.org"
+
+# Настройки уведомлений
+уведомления:
+  показывать-прогресс-загрузки: true
+  звук-при-успехе: true
+  звук-при-ошибке: true
+
+# Настройки резервных копий
+резервные-копии:
+  сохранять-резервные-копии: true
+  максимальное-количество-копий: 5
+  папка-резервных-копий: "plugins/PluginDownloader/backups"
