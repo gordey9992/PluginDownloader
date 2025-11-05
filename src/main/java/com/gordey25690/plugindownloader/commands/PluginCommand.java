@@ -21,7 +21,6 @@ public class PluginCommand implements CommandExecutor {
     
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        
         if (!(sender instanceof Player)) {
             sender.sendMessage("Эта команда только для игроков!");
             return true;
@@ -114,6 +113,20 @@ public class PluginCommand implements CommandExecutor {
                 }
                 break;
                 
+            case "добавить":
+            case "add":
+                if (!player.hasPermission("plugindownloader.manage")) {
+                    MessageUtils.sendMessage(player, "нет-прав");
+                    return true;
+                }
+                if (args.length >= 4) {
+                    // /пдл добавить <название> <ссылка> <описание>
+                    downloadManager.addCustomPlugin(player, args[1], args[2], args[3]);
+                } else {
+                    MessageUtils.sendMessage(player, "использование: /" + label + " добавить <название> <ссылка> <описание>");
+                }
+                break;
+                
             default:
                 showHelp(player, label);
                 break;
@@ -131,6 +144,7 @@ public class PluginCommand implements CommandExecutor {
         MessageUtils.sendMessage(player, "&e/" + label + " инфо <плагин> &7- Информация о плагине");
         MessageUtils.sendMessage(player, "&e/" + label + " поиск <запрос> &7- Поиск плагинов");
         MessageUtils.sendMessage(player, "&e/" + label + " перезагрузить &7- Перезагрузить конфиг");
+        MessageUtils.sendMessage(player, "&e/" + label + " добавить <наз> <ссылка> <опис> &7- Добавить кастомный плагин");
         MessageUtils.sendMessage(player, "&e/магазинплагинов &7- Открыть магазин плагинов");
         MessageUtils.sendMessage(player, "&e/обновлениеплагинов &7- Проверить обновления");
     }
