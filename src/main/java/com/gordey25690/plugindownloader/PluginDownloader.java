@@ -11,6 +11,7 @@ public class PluginDownloader extends JavaPlugin {
     private DownloadManager downloadManager;
     private PluginManager pluginManager;
     private ConfigManager configManager;
+    private SyncManager syncManager; // 📍 ДОБАВЛЯЕМ ЭТУ СТРОКУ
     
     @Override
     public void onEnable() {
@@ -20,6 +21,7 @@ public class PluginDownloader extends JavaPlugin {
         this.configManager = new ConfigManager(this);
         this.downloadManager = new DownloadManager(this);
         this.pluginManager = new PluginManager(this);
+        this.syncManager = new SyncManager(this); // 📍 ДОБАВЛЯЕМ ИНИЦИАЛИЗАЦИЮ
         
         // Регистрация команд
         getCommand("plugindownloader").setExecutor(new PluginCommand(this));
@@ -32,7 +34,14 @@ public class PluginDownloader extends JavaPlugin {
         getCommand("обновлениеплагинов").setTabCompleter(new TabComplete());
         
         // Загрузка конфигурации
-        configManager.reloadConfig();
+        configManager.loadConfig();
+        
+        // Синхронизация общих плагинов
+        if (syncManager.isSyncEnabled()) {
+            getServer().getScheduler().runTaskLater(this, () -> {
+                syncManager.syncSharedPlugins();
+            }, 100L); // Через 5 секунд после запуска
+        }
         
         getLogger().info("PluginDownloader успешно запущен!");
         getLogger().info("Авторы: gordey25690 & DeepSeek");
@@ -58,7 +67,8 @@ public class PluginDownloader extends JavaPlugin {
     public ConfigManager getConfigManager() {
         return configManager;
     }
-public SyncManager getSyncManager() {
-    return syncManager;
-}
+    
+    public SyncManager getSyncManager() { // 📍 ДОБАВЛЯЕМ ЭТОТ МЕТОД
+        return syncManager;
+    }
 }
