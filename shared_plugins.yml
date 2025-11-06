@@ -27,3 +27,25 @@
     источник: "modrinth"
     описание: "Более быстрая версия WorldEdit с новыми функциями"
     ссылка: "https://cdn.modrinth.com/data/z4HZZnLr/versions/o8Ytdhc5/FastAsyncWorldEdit-Paper-2.13.1.jar"
+
+  Chunky:
+    автор: "pop4959"
+    версия: "1.4.40"
+    источник: "modrinth"
+    описание: "Предварительная генерация чанков"
+    ссылка: "https://cdn.modrinth.com/data/fALzjamp/versions/P3y2MXnd/Chunky-Bukkit-1.4.40.jar"
+
+  VoiceMessages:
+    автор: "DimasKama"
+    версия: "1.0.11"
+    источник: "hangar"
+    описание: "Голосовые сообщения в Minecraft, требует установки Simple Voice Chat. Требует мод на клиенте"
+    ссылка: "https://hangarcdn.papermc.io/plugins/DimasKama/VoiceMessages/versions/paper-1.0.11/PAPER/voicemessages-paper-1.0.11.jar"
+
+  Simple Voice Chat:
+    автор: "henkelmax"
+    версия: "2.5.35"
+    источник: "bukkit"
+    описание: "Голосовой чат в Minecraft. Требует мод на клиенте"
+    ссылка: "https://dev.bukkit.org/projects/simple-voice-chat/files/6787262/download"
+
