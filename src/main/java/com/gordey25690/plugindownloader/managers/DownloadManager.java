@@ -363,7 +363,7 @@ public class DownloadManager {
         YamlConfiguration sharedPlugins = plugin.getSyncManager().getSharedPlugins();
         
         String path = null;
-        YamlConfiguration sourceConfig = null;
+        FileConfiguration sourceConfig = null;
         
         // Ищем плагин в общих плагинах
         if (sharedPlugins.contains("общие-плагины." + pluginName)) {
