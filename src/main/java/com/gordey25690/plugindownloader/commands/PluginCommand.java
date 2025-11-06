@@ -8,6 +8,11 @@ import com.gordey25690.plugindownloader.PluginDownloader;
 import com.gordey25690.plugindownloader.managers.DownloadManager;
 import com.gordey25690.plugindownloader.ui.PluginSelectionGUI;
 import com.gordey25690.plugindownloader.utils.MessageUtils;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 public class PluginCommand implements CommandExecutor {
     
