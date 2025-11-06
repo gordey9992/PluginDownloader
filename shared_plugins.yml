@@ -20,3 +20,10 @@
     источник: "github"
     описание: "Автоматически выдает права оператора на основе разрешений"
     ссылка: "https://github.com/gordey9992/OperatorFromPerms/releases/download/v2.0.0/OperatorFromPerms-2.0.0.jar"
+
+  FAWE:
+    автор: "IntellectualSites"
+    версия: "2.13.1"
+    источник: "modrinth"
+    описание: "Более быстрая версия WorldEdit с новыми функциями"
+    ссылка: "https://cdn.modrinth.com/data/z4HZZnLr/versions/o8Ytdhc5/FastAsyncWorldEdit-Paper-2.13.1.jar"
