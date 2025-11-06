@@ -149,179 +149,78 @@ public class PluginCommand implements CommandExecutor {
     }
     
     // 📍 ПОЛНАЯ СИСТЕМА ДЛЯ КОНСОЛИ
-    private boolean handleConsoleCommand(CommandSender sender, String[] args) {
+private void handleConsoleCommand(CommandSender sender, String[] args) {
     if (args.length == 0) {
-        showConsoleMainMenu(sender);
-        return true;
+        sender.sendMessage(ChatColor.GOLD + "=== PluginDownloader ===");
+        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader install <plugin> " + ChatColor.GRAY + "- Установить плагин");
+        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader list " + ChatColor.GRAY + "- Список плагинов");
+        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader remove <plugin> " + ChatColor.GRAY + "- Удалить плагин");
+        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader update [plugin] " + ChatColor.GRAY + "- Обновить плагин");
+        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader info <plugin> " + ChatColor.GRAY + "- Информация о плагине");
+        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader search <query> " + ChatColor.GRAY + "- Поиск плагинов");
+        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader reload " + ChatColor.GRAY + "- Перезагрузить конфиг");
+        return;
     }
 
-    // 📍 КОНВЕРТИРУЕМ РУССКИЕ КОМАНДЫ В АНГЛИЙСКИЕ ДЛЯ КОНСОЛИ
-    String command = args[0].toLowerCase();
+    String mainCommand = args[0].toLowerCase();
     
-    // Русские команды → английские
-    Map<String, String> russianToEnglish = new HashMap<>();
-    russianToEnglish.put("установить", "install");
-    russianToEnglish.put("список", "list");
-    russianToEnglish.put("удалить", "remove");
-    russianToEnglish.put("инфо", "info");
-    russianToEnglish.put("поиск", "search");
-    russianToEnglish.put("перезагрузить", "reload");
-    russianToEnglish.put("синхронизировать", "sync");
-    russianToEnglish.put("статус", "status");
-    russianToEnglish.put("очистить", "clear");
-    russianToEnglish.put("помощь", "help");
-    
-    if (russianToEnglish.containsKey(command)) {
-        command = russianToEnglish.get(command);
+    // Используй разные имена переменных чтобы избежать конфликтов
+    switch (mainCommand) {
+        case "install":
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader install <plugin>");
+                return;
+            }
+            String pluginToInstall = args[1];
+            downloadManager.downloadPlugin(sender, pluginToInstall);
+            break;
+            
+        case "list":
+            pluginManager.sendPluginList(sender);
+            break;
+            
+        case "remove":
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader remove <plugin>");
+                return;
+            }
+            String pluginToRemove = args[1];
+            pluginManager.removePlugin(sender, pluginToRemove);
+            break;
+            
+        case "update":
+            String pluginToUpdate = args.length > 1 ? args[1] : "all";
+            downloadManager.updatePlugins(sender, pluginToUpdate);
+            break;
+            
+        case "info":
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader info <plugin>");
+                return;
+            }
+            String pluginForInfo = args[1];
+            pluginManager.sendPluginInfo(sender, pluginForInfo);
+            break;
+            
+        case "search":
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader search <query>");
+                return;
+            }
+            String searchQuery = args[1];
+            downloadManager.searchPlugins(sender, searchQuery);
+            break;
+            
+        case "reload":
+            configManager.loadConfig();
+            sender.sendMessage(ChatColor.GREEN + "Конфигурация перезагружена!");
+            break;
+            
+        default:
+            sender.sendMessage(ChatColor.RED + "Неизвестная команда: " + mainCommand);
+            break;
     }
-        if (args.length == 0) {
-            showConsoleMainMenu(sender);
-            return true;
-        }
-
-        // 📍 ОБРАБАТЫВАЕМ СОКРАЩЕННЫЕ КОМАНДЫ
-        String command = args[0].toLowerCase();
-        
-        // Сокращения для русских команд
-        switch (command) {
-            case "уст":
-            case "inst":
-            case "i":
-                command = "install";
-                break;
-            case "сп":
-            case "lst":
-            case "l":
-                command = "list";
-                break;
-            case "уд":
-            case "rem":
-            case "r":
-            case "del":
-                command = "remove";
-                break;
-            case "инф":
-            case "inf":
-                command = "info";
-                break;
-            case "поиск":
-            case "find":
-            case "s":
-                command = "search";
-                break;
-            case "пер":
-            case "rel":
-                command = "reload";
-                break;
-            case "синх":
-            case "syn":
-                command = "sync";
-                break;
-            case "стат":
-            case "stat":
-                command = "status";
-                break;
-            case "очист":
-            case "clr":
-                command = "clear";
-                break;
-            case "пом":
-            case "h":
-            case "?":
-                command = "help";
-                break;
-        }
-
-        // 📍 ОБРАБАТЫВАЕМ КОМАНДЫ
-        switch (command) {
-            case "install":
-            case "inst":
-            case "i":
-                if (args.length > 1) {
-                    handleConsoleInstall(sender, args[1]);
-                } else {
-                    showConsoleInstallMenu(sender);
-                }
-                break;
-                
-            case "list":
-            case "lst":
-            case "l":
-                handleConsoleList(sender);
-                break;
-                
-            case "remove":
-            case "rem":
-            case "r":
-            case "delete":
-            case "del":
-                if (args.length > 1) {
-                    handleConsoleRemove(sender, args[1]);
-                } else {
-                    sender.sendMessage("§cИспользование: plugindownloader remove <плагин>");
-                }
-                break;
-                
-            case "reload":
-            case "rel":
-            case "rl":
-                plugin.getConfigManager().reloadConfig();
-                sender.sendMessage("§a[PluginDownloader] Конфигурация перезагружена");
-                break;
-                
-            case "sync":
-            case "syn":
-            case "synchronize":
-                boolean success = plugin.getSyncManager().syncSharedPlugins();
-                if (success) {
-                    sender.sendMessage("§a[PluginDownloader] Синхронизация с GitHub завершена");
-                } else {
-                    sender.sendMessage("§c[PluginDownloader] Ошибка синхронизации с GitHub");
-                }
-                break;
-                
-            case "info":
-            case "inf":
-            case "about":
-                if (args.length > 1) {
-                    handleConsoleInfo(sender, args[1]);
-                } else {
-                    sender.sendMessage("§cИспользование: plugindownloader info <плагин>");
-                }
-                break;
-                
-            case "search":
-            case "find":
-            case "s":
-                if (args.length > 1) {
-                    handleConsoleSearch(sender, args[1]);
-                } else {
-                    sender.sendMessage("§cИспользование: plugindownloader search <запрос>");
-                }
-                break;
-                
-            case "status":
-            case "stat":
-            case "st":
-                handleConsoleStatus(sender);
-                break;
-                
-            case "clear":
-            case "clr":
-            case "clean":
-                handleConsoleClear(sender);
-                break;
-                
-            case "help":
-            case "h":
-            case "?":
-                showConsoleHelp(sender);
-                break;
-                
-            default:
-                showConsoleMainMenu(sender);
-                break;
-        }
+}
         
         return true;
         // 📍 КОНВЕРТИРУЕМ РУССКИЕ КОМАНДЫ В АНГЛИЙСКИЕ ДЛЯ КОНСОЛИ
