@@ -1,382 +1,125 @@
 package com.gordey25690.plugindownloader.commands;
 
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.ChatColor;
 import com.gordey25690.plugindownloader.PluginDownloader;
 import com.gordey25690.plugindownloader.managers.DownloadManager;
-import com.gordey25690.plugindownloader.ui.PluginSelectionGUI;
-import com.gordey25690.plugindownloader.utils.MessageUtils;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
+import com.gordey25690.plugindownloader.managers.PluginManager;
+import com.gordey25690.plugindownloader.managers.ConfigManager;
+import com.gordey25690.plugindownloader.managers.SyncManager;
 
 public class PluginCommand implements CommandExecutor {
-    
     private final PluginDownloader plugin;
     private final DownloadManager downloadManager;
-    
+    private final PluginManager pluginManager;
+    private final ConfigManager configManager;
+    private final SyncManager syncManager;
+
     public PluginCommand(PluginDownloader plugin) {
         this.plugin = plugin;
         this.downloadManager = plugin.getDownloadManager();
+        this.pluginManager = plugin.getPluginManager();
+        this.configManager = plugin.getConfigManager();
+        this.syncManager = plugin.getSyncManager();
     }
-    
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // 📍 ПРОВЕРЯЕМ ЕСЛИ ЭТО КОНСОЛЬ
-        if (!(sender instanceof Player)) {
-            return handleConsoleCommand(sender, args);
-        }
-        
-        // Оригинальный код для игроков
-        Player player = (Player) sender;
-        
-        if (!player.hasPermission("plugindownloader.use")) {
-            MessageUtils.sendMessage(player, "нет-прав");
+        if (!sender.hasPermission("plugindownloader.use")) {
+            sender.sendMessage(ChatColor.RED + "У вас нет прав для использования этой команды!");
             return true;
         }
-        
+
         if (args.length == 0) {
-            showHelp(player, label);
+            sendHelp(sender, label);
             return true;
         }
+
+        String subCommand = args[0].toLowerCase();
         
-        switch (args[0].toLowerCase()) {
-            case "установить":
+        switch (subCommand) {
             case "install":
-                if (!player.hasPermission("plugindownloader.install")) {
-                    MessageUtils.sendMessage(player, "нет-прав");
+                if (args.length < 2) {
+                    sender.sendMessage(ChatColor.RED + "Использование: /" + label + " install <plugin>");
                     return true;
                 }
-                if (args.length > 1) {
-                    downloadManager.installPlugin(player, args[1]);
-                } else {
-                    PluginSelectionGUI.openPluginSelection(player);
-                }
+                downloadManager.downloadPlugin(sender, args[1]);
                 break;
                 
-            case "список":
             case "list":
-                downloadManager.showPluginList(player);
+                pluginManager.sendPluginList(sender);
                 break;
                 
-            case "удалить":
             case "remove":
-                if (!player.hasPermission("plugindownloader.remove")) {
-                    MessageUtils.sendMessage(player, "нет-прав");
+                if (args.length < 2) {
+                    sender.sendMessage(ChatColor.RED + "Использование: /" + label + " remove <plugin>");
                     return true;
                 }
-                if (args.length > 1) {
-                    downloadManager.removePlugin(player, args[1]);
-                } else {
-                    MessageUtils.sendMessage(player, "использование: /" + label + " удалить <плагин>");
-                }
+                pluginManager.removePlugin(sender, args[1]);
                 break;
                 
-            case "обновить":
             case "update":
-                if (!player.hasPermission("plugindownloader.update")) {
-                    MessageUtils.sendMessage(player, "нет-прав");
-                    return true;
-                }
-                if (args.length > 1) {
-                    downloadManager.updatePlugin(player, args[1]);
-                } else {
-                    downloadManager.checkAllUpdates(player);
-                }
+                String pluginToUpdate = args.length > 1 ? args[1] : "all";
+                downloadManager.updatePlugins(sender, pluginToUpdate);
                 break;
                 
-            case "перезагрузить":
-            case "reload":
-                if (!player.hasPermission("plugindownloader.reload")) {
-                    MessageUtils.sendMessage(player, "нет-прав");
-                    return true;
-                }
-                plugin.getConfigManager().reloadConfig();
-                MessageUtils.sendMessage(player, "конфиг-перезагружен");
-                break;
-                
-            case "инфо":
             case "info":
-                if (args.length > 1) {
-                    downloadManager.showPluginInfo(player, args[1]);
-                } else {
-                    MessageUtils.sendMessage(player, "использование: /" + label + " инфо <плагин>");
+                if (args.length < 2) {
+                    sender.sendMessage(ChatColor.RED + "Использование: /" + label + " info <plugin>");
+                    return true;
                 }
+                pluginManager.sendPluginInfo(sender, args[1]);
                 break;
                 
-            case "поиск":
             case "search":
-                if (args.length > 1) {
-                    downloadManager.searchPlugins(player, args[1]);
-                } else {
-                    MessageUtils.sendMessage(player, "использование: /" + label + " поиск <запрос>");
-                }
-                break;
-                
-            case "добавить":
-            case "add":
-                if (!player.hasPermission("plugindownloader.manage")) {
-                    MessageUtils.sendMessage(player, "нет-прав");
+                if (args.length < 2) {
+                    sender.sendMessage(ChatColor.RED + "Использование: /" + label + " search <query>");
                     return true;
                 }
-                if (args.length >= 4) {
-                    downloadManager.addCustomPlugin(player, args[1], args[2], args[3]);
-                } else {
-                    MessageUtils.sendMessage(player, "использование: /" + label + " добавить <название> <ссылка> <описание>");
-                }
+                downloadManager.searchPlugins(sender, args[1]);
                 break;
                 
-            case "синхронизировать":
+            case "reload":
+                configManager.loadConfig();
+                sender.sendMessage(ChatColor.GREEN + "Конфигурация перезагружена!");
+                break;
+                
             case "sync":
-                if (!player.hasPermission("plugindownloader.manage")) {
-                    MessageUtils.sendMessage(player, "нет-прав");
-                    return true;
+                if (sender.hasPermission("plugindownloader.sync")) {
+                    sender.sendMessage(ChatColor.YELLOW + "Запуск синхронизации...");
+                    syncManager.syncSharedPlugins();
+                    sender.sendMessage(ChatColor.GREEN + "Синхронизация завершена!");
+                } else {
+                    sender.sendMessage(ChatColor.RED + "У вас нет прав для синхронизации!");
                 }
-                plugin.getSyncManager().syncSharedPlugins();
-                MessageUtils.sendMessage(player, "синхронизация-завершена");
                 break;
                 
             default:
-                showHelp(player, label);
+                sender.sendMessage(ChatColor.RED + "Неизвестная команда: " + subCommand);
+                sendHelp(sender, label);
                 break;
         }
         
         return true;
     }
-    
-    // 📍 ПОЛНАЯ СИСТЕМА ДЛЯ КОНСОЛИ
-private void handleConsoleCommand(CommandSender sender, String[] args) {
-    if (args.length == 0) {
-        sender.sendMessage(ChatColor.GOLD + "=== PluginDownloader ===");
-        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader install <plugin> " + ChatColor.GRAY + "- Установить плагин");
-        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader list " + ChatColor.GRAY + "- Список плагинов");
-        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader remove <plugin> " + ChatColor.GRAY + "- Удалить плагин");
-        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader update [plugin] " + ChatColor.GRAY + "- Обновить плагин");
-        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader info <plugin> " + ChatColor.GRAY + "- Информация о плагине");
-        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader search <query> " + ChatColor.GRAY + "- Поиск плагинов");
-        sender.sendMessage(ChatColor.YELLOW + "/plugindownloader reload " + ChatColor.GRAY + "- Перезагрузить конфиг");
-        return;
-    }
 
-    String mainCommand = args[0].toLowerCase();
-    
-    // Используй разные имена переменных чтобы избежать конфликтов
-    switch (mainCommand) {
-        case "install":
-            if (args.length < 2) {
-                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader install <plugin>");
-                return;
-            }
-            String pluginToInstall = args[1];
-            downloadManager.downloadPlugin(sender, pluginToInstall);
-            break;
-            
-        case "list":
-            pluginManager.sendPluginList(sender);
-            break;
-            
-        case "remove":
-            if (args.length < 2) {
-                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader remove <plugin>");
-                return;
-            }
-            String pluginToRemove = args[1];
-            pluginManager.removePlugin(sender, pluginToRemove);
-            break;
-            
-        case "update":
-            String pluginToUpdate = args.length > 1 ? args[1] : "all";
-            downloadManager.updatePlugins(sender, pluginToUpdate);
-            break;
-            
-        case "info":
-            if (args.length < 2) {
-                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader info <plugin>");
-                return;
-            }
-            String pluginForInfo = args[1];
-            pluginManager.sendPluginInfo(sender, pluginForInfo);
-            break;
-            
-        case "search":
-            if (args.length < 2) {
-                sender.sendMessage(ChatColor.RED + "Использование: /plugindownloader search <query>");
-                return;
-            }
-            String searchQuery = args[1];
-            downloadManager.searchPlugins(sender, searchQuery);
-            break;
-            
-        case "reload":
-            configManager.loadConfig();
-            sender.sendMessage(ChatColor.GREEN + "Конфигурация перезагружена!");
-            break;
-            
-        default:
-            sender.sendMessage(ChatColor.RED + "Неизвестная команда: " + mainCommand);
-            break;
-    }
-}
+    private void sendHelp(CommandSender sender, String label) {
+        sender.sendMessage(ChatColor.GOLD + "=== PluginDownloader ===");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " install <plugin> " + ChatColor.GRAY + "- Установить плагин");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " list " + ChatColor.GRAY + "- Список плагинов");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " remove <plugin> " + ChatColor.GRAY + "- Удалить плагин");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " update [plugin] " + ChatColor.GRAY + "- Обновить плагин");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " info <plugin> " + ChatColor.GRAY + "- Информация о плагине");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " search <query> " + ChatColor.GRAY + "- Поиск плагинов");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " reload " + ChatColor.GRAY + "- Перезагрузить конфиг");
+        sender.sendMessage(ChatColor.YELLOW + "/" + label + " sync " + ChatColor.GRAY + "- Синхронизировать плагины");
         
-        return true;
-        // 📍 КОНВЕРТИРУЕМ РУССКИЕ КОМАНДЫ В АНГЛИЙСКИЕ ДЛЯ КОНСОЛИ
-    String command = args[0].toLowerCase();
-    
-    // Русские команды → английские
-    Map<String, String> russianToEnglish = new HashMap<>();
-    russianToEnglish.put("установить", "install");
-    russianToEnglish.put("список", "list");
-    russianToEnglish.put("удалить", "remove");
-    russianToEnglish.put("инфо", "info");
-    russianToEnglish.put("поиск", "search");
-    russianToEnglish.put("перезагрузить", "reload");
-    russianToEnglish.put("синхронизировать", "sync");
-    russianToEnglish.put("статус", "status");
-    russianToEnglish.put("очистить", "clear");
-    russianToEnglish.put("помощь", "help");
-    }
-    
-    // 📍 СПЕЦИАЛЬНЫЕ МЕТОДЫ ДЛЯ КОНСОЛИ
-    private void showConsoleMainMenu(CommandSender sender) {
-        sender.sendMessage("§6╔════════════════════════════════════════╗");
-        sender.sendMessage("§6║      §ePluginDownloader Console      §6║");
-        sender.sendMessage("§6╠════════════════════════════════════════╣");
-        sender.sendMessage("§6║ §eОсновные команды:§6                  ║");
-        sender.sendMessage("§6║ §fi <плагин>§7 - Установка           §6║");
-        sender.sendMessage("§6║ §fl§7 - Список плагинов              §6║");
-        sender.sendMessage("§6║ §fr <плагин>§7 - Удаление            §6║");
-        sender.sendMessage("§6║ §finf <плагин>§7 - Информация        §6║");
-        sender.sendMessage("§6║ §fs <запрос>§7 - Поиск               §6║");
-        sender.sendMessage("§6║                                      §6║");
-        sender.sendMessage("§6║ §eСистемные команды:§6                 ║");
-        sender.sendMessage("§6║ §frl§7 - Перезагрузка конфигов       §6║");
-        sender.sendMessage("§6║ §fsyn§7 - Синхронизация с GitHub     §6║");
-        sender.sendMessage("§6║ §fst§7 - Статус системы              §6║");
-        sender.sendMessage("§6║ §fclr§7 - Очистка кэша               §6║");
-        sender.sendMessage("§6║ §fh§7 - Полная справка              §6║");
-        sender.sendMessage("§6╚═══════════════════════════════════════╝");
-    }
-    
-    private void showConsoleInstallMenu(CommandSender sender) {
-        sender.sendMessage("§6╔════════════════════════════════════════╗");
-        sender.sendMessage("§6║         §eУстановка плагинов§6         ║");
-        sender.sendMessage("§6╠════════════════════════════════════════╣");
-        sender.sendMessage("§6║ §fДоступные плагины:§6                 ║");
-   
-        // Показываем популярные плагины для быстрой установки
-        sender.sendMessage("§6║ §aViaVersion§7 - поддержка версий    §6║");
-        sender.sendMessage("§6║ §aProtocolLib§7 - работа с пакетами  §6║");
-        sender.sendMessage("§6║ §aWorldEdit§7 - редактор карт        §6║");
-        sender.sendMessage("§6║ §aLuckPerms§7 - система прав         §6║");
-        sender.sendMessage("§6║                                      §6║");
-        sender.sendMessage("§6║ §eИспользование:§6                     ║");
-        sender.sendMessage("§6║ §fplugindownloader i <name>§6          ║");
-        sender.sendMessage("§6║ §fПример: i ViaVersion§6               ║");
-        sender.sendMessage("§6╚════════════════════════════════════════╝");
-    }
-    
-    private void handleConsoleInstall(CommandSender sender, String pluginName) {
-        boolean success = downloadManager.installPluginConsole(sender, pluginName);
-        if (success) {
-            sender.sendMessage("§a[PluginDownloader] Плагин " + pluginName + " успешно установлен!");
-            sender.sendMessage("§7[!] Для применения изменений перезагрузите сервер");
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            player.sendMessage(ChatColor.GRAY + "Алиасы: /пдл, /плагины, /магазинплагинов, /обновлениеплагинов");
         }
-    }
-    
-    private void handleConsoleList(CommandSender sender) {
-        downloadManager.showConsolePluginList(sender);
-    }
-    
-    private void handleConsoleRemove(CommandSender sender, String pluginName) {
-        boolean success = downloadManager.removePluginConsole(sender, pluginName);
-        if (success) {
-            sender.sendMessage("§a[PluginDownloader] Плагин " + pluginName + " успешно удален!");
-            sender.sendMessage("§7[!] Для применения изменений перезагрузите сервер");
-        }
-    }
-    
-    private void handleConsoleInfo(CommandSender sender, String pluginName) {
-        downloadManager.showConsolePluginInfo(sender, pluginName);
-    }
-    
-    private void handleConsoleSearch(CommandSender sender, String query) {
-        downloadManager.searchPluginsConsole(sender, query);
-    }
-    
-    private void handleConsoleStatus(CommandSender sender) {
-        sender.sendMessage("§6╔════════════════════════════════════════════════════════════════════════╗");
-        sender.sendMessage("§6║         §eСтатус системы§6                                             ║");
-        sender.sendMessage("§6╠════════════════════════════════════════════════════════════════════════╣");
-        sender.sendMessage("§6║ §fВерсия плагина:§7 " + plugin.getDescription().getVersion() + "§6     ║");
-        sender.sendMessage("§6║ §fСинхронизация:§7 " + 
-            (plugin.getSyncManager().isSyncEnabled() ? "§aВключена" : "§cВыключена") + "§6             ║");
-        sender.sendMessage("§6║ §fПоследняя синхронизация:§7 " + getLastSyncTimeFormatted() + "      §6║");
-        sender.sendMessage("§6║ §fОбщих плагинов:§7 " + downloadManager.getSharedPluginsCount() + "  §6║");
-        sender.sendMessage("§6║ §fОсновных плагинов:§7 " + downloadManager.getMainPluginsCount() + " §6║");
-        sender.sendMessage("§6╚════════════════════════════════════════════════════════════════════════╝");
-    }
-    
-    private void handleConsoleClear(CommandSender sender) {
-        sender.sendMessage("§e[PluginDownloader] Очистка кэша...");
-        // Здесь можно добавить очистку кэша
-        sender.sendMessage("§a[PluginDownloader] Кэш успешно очищен");
-    }
-    
-    private String getLastSyncTimeFormatted() {
-        long lastSync = plugin.getSyncManager().getLastSyncTime();
-        if (lastSync == 0) return "§cНикогда";
-        
-        long diff = System.currentTimeMillis() - lastSync;
-        long minutes = diff / (60 * 1000);
-        
-        if (minutes < 1) return "§aТолько что";
-        if (minutes < 60) return "§a" + minutes + " мин назад";
-        
-        long hours = minutes / 60;
-        if (hours < 24) return "§e" + hours + " ч назад";
-        
-        return "§c" + (hours / 24) + " дн назад";
-    }
-    
-    private void showConsoleHelp(CommandSender sender) {
-        sender.sendMessage("§6=== PluginDownloader - Полная справка ===");
-        sender.sendMessage("§eОсновные команды:");
-        sender.sendMessage("§f  install§7, §fi§7 - Установить плагин");
-        sender.sendMessage("§f  list§7, §fl§7 - Показать список всех плагинов");
-        sender.sendMessage("§f  remove§7, §fr§7 - Удалить плагин");
-        sender.sendMessage("§f  info§7, §finf§7 - Информация о плагине");
-        sender.sendMessage("§f  search§7, §fs§7 - Поиск плагинов");
-        sender.sendMessage("");
-        sender.sendMessage("§eСистемные команды:");
-        sender.sendMessage("§f  reload§7, §frl§7 - Перезагрузить конфигурацию");
-        sender.sendMessage("§f  sync§7, §fsyn§7 - Синхронизировать с GitHub");
-        sender.sendMessage("§f  status§7, §fst§7 - Показать статус системы");
-        sender.sendMessage("§f  clear§7, §fclr§7 - Очистить кэш");
-        sender.sendMessage("§f  help§7, §fh§7 - Эта справка");
-        sender.sendMessage("");
-        sender.sendMessage("§eПримеры использования:");
-        sender.sendMessage("§7  plugindownloader i ViaVersion");
-        sender.sendMessage("§7  plugindownloader l");
-        sender.sendMessage("§7  plugindownloader st");
-        sender.sendMessage("§7  plugindownloader r ProtocolLib");
-    }
-    
-    private void showHelp(Player player, String label) {
-        MessageUtils.sendMessage(player, "&6=== Помощь PluginDownloader ===");
-        MessageUtils.sendMessage(player, "&e/" + label + " установить [плагин] &7- Установить плагин");
-        MessageUtils.sendMessage(player, "&e/" + label + " список &7- Список доступных плагинов");
-        MessageUtils.sendMessage(player, "&e/" + label + " удалить <плагин> &7- Удалить плагин");
-        MessageUtils.sendMessage(player, "&e/" + label + " обновить [плагин] &7- Обновить плагин(ы)");
-        MessageUtils.sendMessage(player, "&e/" + label + " инфо <плагин> &7- Информация о плагине");
-        MessageUtils.sendMessage(player, "&e/" + label + " поиск <запрос> &7- Поиск плагинов");
-        MessageUtils.sendMessage(player, "&e/" + label + " перезагрузить &7- Перезагрузить конфиг");
-        MessageUtils.sendMessage(player, "&e/" + label + " добавить <наз> <ссылка> <опис> &7- Добавить кастомный плагин");
-        MessageUtils.sendMessage(player, "&e/" + label + " синхронизировать &7- Синхронизировать с GitHub");
-        MessageUtils.sendMessage(player, "&e/магазинплагинов &7- Открыть магазин плагинов");
-        MessageUtils.sendMessage(player, "&e/обновлениеплагинов &7- Проверить обновления");
     }
 }
