@@ -145,6 +145,30 @@ public class PluginCommand implements CommandExecutor {
     
     // 📍 ПОЛНАЯ СИСТЕМА ДЛЯ КОНСОЛИ
     private boolean handleConsoleCommand(CommandSender sender, String[] args) {
+    if (args.length == 0) {
+        showConsoleMainMenu(sender);
+        return true;
+    }
+
+    // 📍 КОНВЕРТИРУЕМ РУССКИЕ КОМАНДЫ В АНГЛИЙСКИЕ ДЛЯ КОНСОЛИ
+    String command = args[0].toLowerCase();
+    
+    // Русские команды → английские
+    Map<String, String> russianToEnglish = new HashMap<>();
+    russianToEnglish.put("установить", "install");
+    russianToEnglish.put("список", "list");
+    russianToEnglish.put("удалить", "remove");
+    russianToEnglish.put("инфо", "info");
+    russianToEnglish.put("поиск", "search");
+    russianToEnglish.put("перезагрузить", "reload");
+    russianToEnglish.put("синхронизировать", "sync");
+    russianToEnglish.put("статус", "status");
+    russianToEnglish.put("очистить", "clear");
+    russianToEnglish.put("помощь", "help");
+    
+    if (russianToEnglish.containsKey(command)) {
+        command = russianToEnglish.get(command);
+    }
         if (args.length == 0) {
             showConsoleMainMenu(sender);
             return true;
