@@ -404,19 +404,16 @@ public class PluginCommand implements CommandExecutor {
     }
     
     private void handleConsoleStatus(CommandSender sender) {
-        sender.sendMessage("§6╔════════════════════════════════════════╗");
-        sender.sendMessage("§6║         §eСтатус системы§6             ║");
-        sender.sendMessage("§6╠════════════════════════════════════════╣");
-        sender.sendMessage("§6║ §fВерсия плагина:§7 " + plugin.getDescription().getVersion() + "§6           ║");
+        sender.sendMessage("§6╔════════════════════════════════════════════════════════════════════════╗");
+        sender.sendMessage("§6║         §eСтатус системы§6                                             ║");
+        sender.sendMessage("§6╠════════════════════════════════════════════════════════════════════════╣");
+        sender.sendMessage("§6║ §fВерсия плагина:§7 " + plugin.getDescription().getVersion() + "§6     ║");
         sender.sendMessage("§6║ §fСинхронизация:§7 " + 
-            (plugin.getSyncManager().isSyncEnabled() ? "§aВключена" : "§cВыключена") + "§6         ║");
-        sender.sendMessage("§6║ §fПоследняя синхронизация:§7 " +       ║");
-            getLastSyncTimeFormatted() + "                           §6║");
-        sender.sendMessage("§6║ §fОбщих плагинов:§7 " +                ║");
-            downloadManager.getSharedPluginsCount() + "              §6║");
-        sender.sendMessage("§6║ §fОсновных плагинов:§7 " +             ║");
-            downloadManager.getMainPluginsCount() + "                §6║");
-        sender.sendMessage("§6╚════════════════════════════════════════╝");
+            (plugin.getSyncManager().isSyncEnabled() ? "§aВключена" : "§cВыключена") + "§6             ║");
+        sender.sendMessage("§6║ §fПоследняя синхронизация:§7 " + getLastSyncTimeFormatted() + "      §6║");
+        sender.sendMessage("§6║ §fОбщих плагинов:§7 " + downloadManager.getSharedPluginsCount() + "  §6║");
+        sender.sendMessage("§6║ §fОсновных плагинов:§7 " + downloadManager.getMainPluginsCount() + " §6║");
+        sender.sendMessage("§6╚════════════════════════════════════════════════════════════════════════╝");
     }
     
     private void handleConsoleClear(CommandSender sender) {
