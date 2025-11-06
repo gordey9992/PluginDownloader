@@ -3,7 +3,7 @@ version: 1.0.0
 main: com.gordey25690.plugindownloader.PluginDownloader
 api-version: "1.21"
 authors: [gordey25690, DeepSeek]
-description: Плагин для загрузки и управления другими плагинами
+description: Плагин для загрузки плагинов с системой авторизации
 website: https://github.com/gordey9992
 
 commands:
@@ -19,6 +19,22 @@ commands:
     description: Проверить обновления плагинов
     usage: /<command> [все|плагин]
     aliases: [оп, pluginupdate]
+  login:
+    description: Авторизация на сервере
+    usage: /<command> <пароль>
+    aliases: [логин, l, вход, auth, аут, li, log, войти, lgn, signin, lin, войти, вх]
+  register:
+    description: Регистрация на сервере
+    usage: /<command> <пароль> <подтверждение>
+    aliases: [рег, r, регистрация, reg, rg, register, регистр, regis, signup, re, regg, зарегаться]
+  rememberme:
+    description: Запомнить меня на 1 день
+    usage: /<command>
+    aliases: [запомнить, remember, запомни, rm, me, запомнитьменя, rem, remem, запомнименя]
+  resetpassword:
+    description: Сбросить пароль игрока (админы)
+    usage: /<command> <игрок>
+    aliases: [сброспароль, resetpass, rp, сброс, reset, resetpasswd, сброситьпароль, сп]
 
 permissions:
   plugindownloader.*:
@@ -30,10 +46,11 @@ permissions:
       plugindownloader.update: true
       plugindownloader.reload: true
       plugindownloader.sync: true
+      plugindownloader.resetpassword: true
   
   plugindownloader.use:
     description: Основное разрешение на использование
-    default: op
+    default: true
   
   plugindownloader.install:
     description: Установка плагинов
@@ -53,4 +70,8 @@ permissions:
   
   plugindownloader.sync:
     description: Синхронизация плагинов
+    default: op
+  
+  plugindownloader.resetpassword:
+    description: Сброс паролей игроков
     default: op
