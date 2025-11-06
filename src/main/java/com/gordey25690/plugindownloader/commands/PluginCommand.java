@@ -149,10 +149,65 @@ public class PluginCommand implements CommandExecutor {
             showConsoleMainMenu(sender);
             return true;
         }
+
+        // 📍 ОБРАБАТЫВАЕМ СОКРАЩЕННЫЕ КОМАНДЫ
+        String command = args[0].toLowerCase();
         
-        switch (args[0].toLowerCase()) {
-            case "установить":
+        // Сокращения для русских команд
+        switch (command) {
+            case "уст":
+            case "inst":
+            case "i":
+                command = "install";
+                break;
+            case "сп":
+            case "lst":
+            case "l":
+                command = "list";
+                break;
+            case "уд":
+            case "rem":
+            case "r":
+            case "del":
+                command = "remove";
+                break;
+            case "инф":
+            case "inf":
+                command = "info";
+                break;
+            case "поиск":
+            case "find":
+            case "s":
+                command = "search";
+                break;
+            case "пер":
+            case "rel":
+                command = "reload";
+                break;
+            case "синх":
+            case "syn":
+                command = "sync";
+                break;
+            case "стат":
+            case "stat":
+                command = "status";
+                break;
+            case "очист":
+            case "clr":
+                command = "clear";
+                break;
+            case "пом":
+            case "h":
+            case "?":
+                command = "help";
+                break;
+        }
+
+        // 📍 ОБРАБАТЫВАЕМ КОМАНДЫ
+        switch (command) {
             case "install":
+            case "inst":
+            case "i":
                 if (args.length > 1) {
                     handleConsoleInstall(sender, args[1]);
                 } else {
@@ -160,28 +215,34 @@ public class PluginCommand implements CommandExecutor {
                 }
                 break;
                 
-            case "список":
             case "list":
+            case "lst":
+            case "l":
                 handleConsoleList(sender);
                 break;
                 
-            case "удалить":
             case "remove":
+            case "rem":
+            case "r":
+            case "delete":
+            case "del":
                 if (args.length > 1) {
                     handleConsoleRemove(sender, args[1]);
                 } else {
-                    sender.sendMessage("§cИспользование: plugindownloader удалить <плагин>");
+                    sender.sendMessage("§cИспользование: plugindownloader remove <плагин>");
                 }
                 break;
                 
-            case "перезагрузить":
             case "reload":
+            case "rel":
+            case "rl":
                 plugin.getConfigManager().reloadConfig();
                 sender.sendMessage("§a[PluginDownloader] Конфигурация перезагружена");
                 break;
                 
-            case "синхронизировать":
             case "sync":
+            case "syn":
+            case "synchronize":
                 boolean success = plugin.getSyncManager().syncSharedPlugins();
                 if (success) {
                     sender.sendMessage("§a[PluginDownloader] Синхронизация с GitHub завершена");
@@ -190,36 +251,41 @@ public class PluginCommand implements CommandExecutor {
                 }
                 break;
                 
-            case "инфо":
             case "info":
+            case "inf":
+            case "about":
                 if (args.length > 1) {
                     handleConsoleInfo(sender, args[1]);
                 } else {
-                    sender.sendMessage("§cИспользование: plugindownloader инфо <плагин>");
+                    sender.sendMessage("§cИспользование: plugindownloader info <плагин>");
                 }
                 break;
                 
-            case "поиск":
             case "search":
+            case "find":
+            case "s":
                 if (args.length > 1) {
                     handleConsoleSearch(sender, args[1]);
                 } else {
-                    sender.sendMessage("§cИспользование: plugindownloader поиск <запрос>");
+                    sender.sendMessage("§cИспользование: plugindownloader search <запрос>");
                 }
                 break;
                 
-            case "статус":
             case "status":
+            case "stat":
+            case "st":
                 handleConsoleStatus(sender);
                 break;
                 
-            case "очистить":
             case "clear":
+            case "clr":
+            case "clean":
                 handleConsoleClear(sender);
                 break;
                 
-            case "помощь":
             case "help":
+            case "h":
+            case "?":
                 showConsoleHelp(sender);
                 break;
                 
@@ -229,158 +295,6 @@ public class PluginCommand implements CommandExecutor {
         }
         
         return true;
-private boolean handleConsoleCommand(CommandSender sender, String[] args) {
-    if (args.length == 0) {
-        showConsoleMainMenu(sender);
-        return true;
-    }
-
-    // 📍 ОБРАБАТЫВАЕМ СОКРАЩЕННЫЕ КОМАНДЫ
-    String command = args[0].toLowerCase();
-    
-    // Сокращения для русских команд
-    switch (command) {
-        case "уст":
-        case "inst":
-        case "i":
-            command = "установить";
-            break;
-        case "сп":
-        case "lst":
-        case "l":
-            command = "список";
-            break;
-        case "уд":
-        case "rem":
-        case "r":
-        case "del":
-            command = "удалить";
-            break;
-        case "инф":
-        case "inf":
-            command = "инфо";
-            break;
-        case "поиск":
-        case "find":
-        case "s":
-            command = "поиск";
-            break;
-        case "пер":
-        case "rel":
-            command = "перезагрузить";
-            break;
-        case "синх":
-        case "syn":
-            command = "синхронизировать";
-            break;
-        case "стат":
-        case "stat":
-            command = "статус";
-            break;
-        case "очист":
-        case "clr":
-            command = "очистить";
-            break;
-        case "пом":
-        case "h":
-        case "?":
-            command = "помощь";
-            break;
-    }
-
-    // 📍 ОБРАБАТЫВАЕМ АНГЛИЙСКИЕ СОКРАЩЕНИЯ
-    switch (command) {
-        case "install":
-        case "inst":
-        case "i":
-            if (args.length > 1) {
-                handleConsoleInstall(sender, args[1]);
-            } else {
-                showConsoleInstallMenu(sender);
-            }
-            break;
-            
-        case "list":
-        case "lst":
-        case "l":
-            handleConsoleList(sender);
-            break;
-            
-        case "remove":
-        case "rem":
-        case "r":
-        case "delete":
-        case "del":
-            if (args.length > 1) {
-                handleConsoleRemove(sender, args[1]);
-            } else {
-                sender.sendMessage("§cИспользование: plugindownloader remove <плагин>");
-            }
-            break;
-            
-        case "reload":
-        case "rel":
-        case "rl":
-            plugin.getConfigManager().reloadConfig();
-            sender.sendMessage("§a[PluginDownloader] Конфигурация перезагружена");
-            break;
-            
-        case "sync":
-        case "syn":
-        case "synchronize":
-            boolean success = plugin.getSyncManager().syncSharedPlugins();
-            if (success) {
-                sender.sendMessage("§a[PluginDownloader] Синхронизация с GitHub завершена");
-            } else {
-                sender.sendMessage("§c[PluginDownloader] Ошибка синхронизации с GitHub");
-            }
-            break;
-            
-        case "info":
-        case "inf":
-        case "about":
-            if (args.length > 1) {
-                handleConsoleInfo(sender, args[1]);
-            } else {
-                sender.sendMessage("§cИспользование: plugindownloader info <плагин>");
-            }
-            break;
-            
-        case "search":
-        case "find":
-        case "s":
-            if (args.length > 1) {
-                handleConsoleSearch(sender, args[1]);
-            } else {
-                sender.sendMessage("§cИспользование: plugindownloader search <запрос>");
-            }
-            break;
-            
-        case "status":
-        case "stat":
-        case "st":
-            handleConsoleStatus(sender);
-            break;
-            
-        case "clear":
-        case "clr":
-        case "clean":
-            handleConsoleClear(sender);
-            break;
-            
-        case "help":
-        case "h":
-        case "?":
-            showConsoleHelp(sender);
-            break;
-            
-        default:
-            showConsoleMainMenu(sender);
-            break;
-    }
-    
-    return true;
-}
     }
     
     // 📍 СПЕЦИАЛЬНЫЕ МЕТОДЫ ДЛЯ КОНСОЛИ
@@ -389,18 +303,18 @@ private boolean handleConsoleCommand(CommandSender sender, String[] args) {
         sender.sendMessage("§6║       §ePluginDownloader Console§6       ║");
         sender.sendMessage("§6╠══════════════════════════════════╣");
         sender.sendMessage("§6║ §eОсновные команды:§6                     ║");
-        sender.sendMessage("§6║ §finstall <плагин>§7 - Установка         §6║");
-        sender.sendMessage("§6║ §flist§7 - Список плагинов              §6║");
-        sender.sendMessage("§6║ §fremove <плагин>§7 - Удаление          §6║");
-        sender.sendMessage("§6║ §finfo <плагин>§7 - Информация          §6║");
-        sender.sendMessage("§6║ §fsearch <запрос>§7 - Поиск             §6║");
+        sender.sendMessage("§6║ §fi <плагин>§7 - Установка              §6║");
+        sender.sendMessage("§6║ §fl§7 - Список плагинов                §6║");
+        sender.sendMessage("§6║ §fr <плагин>§7 - Удаление              §6║");
+        sender.sendMessage("§6║ §finf <плагин>§7 - Информация          §6║");
+        sender.sendMessage("§6║ §fs <запрос>§7 - Поиск                 §6║");
         sender.sendMessage("§6║                                      §6║");
         sender.sendMessage("§6║ §eСистемные команды:§6                   ║");
-        sender.sendMessage("§6║ §freload§7 - Перезагрузка конфигов     §6║");
-        sender.sendMessage("§6║ §fsync§7 - Синхронизация с GitHub     §6║");
-        sender.sendMessage("§6║ §fstatus§7 - Статус системы           §6║");
-        sender.sendMessage("§6║ §fclear§7 - Очистка кэша              §6║");
-        sender.sendMessage("§6║ §fhelp§7 - Полная справка            §6║");
+        sender.sendMessage("§6║ §frl§7 - Перезагрузка конфигов        §6║");
+        sender.sendMessage("§6║ §fsyn§7 - Синхронизация с GitHub     §6║");
+        sender.sendMessage("§6║ §fst§7 - Статус системы              §6║");
+        sender.sendMessage("§6║ §fclr§7 - Очистка кэша               §6║");
+        sender.sendMessage("§6║ §fh§7 - Полная справка              §6║");
         sender.sendMessage("§6╚══════════════════════════════════╝");
     }
     
@@ -417,22 +331,16 @@ private boolean handleConsoleCommand(CommandSender sender, String[] args) {
         sender.sendMessage("§6║ §aLuckPerms§7 - система прав          §6║");
         sender.sendMessage("§6║                                      §6║");
         sender.sendMessage("§6║ §eИспользование:§6                     ║");
-        sender.sendMessage("§6║ §fplugindownloader install <name>§6    ║");
-        sender.sendMessage("§6║ §fПример: install ViaVersion§6         ║");
+        sender.sendMessage("§6║ §fplugindownloader i <name>§6          ║");
+        sender.sendMessage("§6║ §fПример: i ViaVersion§6               ║");
         sender.sendMessage("§6╚══════════════════════════════════╝");
     }
     
     private void handleConsoleInstall(CommandSender sender, String pluginName) {
-        sender.sendMessage("§e[PluginDownloader] Начинаю установку: §6" + pluginName);
-        
-        // Здесь будет вызов метода DownloadManager для консоли
         boolean success = downloadManager.installPluginConsole(sender, pluginName);
-        
         if (success) {
             sender.sendMessage("§a[PluginDownloader] Плагин " + pluginName + " успешно установлен!");
             sender.sendMessage("§7[!] Для применения изменений перезагрузите сервер");
-        } else {
-            sender.sendMessage("§c[PluginDownloader] Ошибка установки плагина " + pluginName);
         }
     }
     
@@ -441,15 +349,10 @@ private boolean handleConsoleCommand(CommandSender sender, String[] args) {
     }
     
     private void handleConsoleRemove(CommandSender sender, String pluginName) {
-        sender.sendMessage("§e[PluginDownloader] Удаление плагина: §6" + pluginName);
-        
         boolean success = downloadManager.removePluginConsole(sender, pluginName);
-        
         if (success) {
             sender.sendMessage("§a[PluginDownloader] Плагин " + pluginName + " успешно удален!");
             sender.sendMessage("§7[!] Для применения изменений перезагрузите сервер");
-        } else {
-            sender.sendMessage("§c[PluginDownloader] Ошибка удаления плагина " + pluginName);
         }
     }
     
@@ -499,28 +402,28 @@ private boolean handleConsoleCommand(CommandSender sender, String[] args) {
         return "§c" + (hours / 24) + " дн назад";
     }
     
-private void showConsoleHelp(CommandSender sender) {
-    sender.sendMessage("§6=== PluginDownloader - Полная справка ===");
-    sender.sendMessage("§eОсновные команды:");
-    sender.sendMessage("§f  install§7, §fi§7 - Установить плагин");
-    sender.sendMessage("§f  list§7, §fl§7 - Показать список всех плагинов");
-    sender.sendMessage("§f  remove§7, §fr§7 - Удалить плагин");
-    sender.sendMessage("§f  info§7, §finf§7 - Информация о плагине");
-    sender.sendMessage("§f  search§7, §fs§7 - Поиск плагинов");
-    sender.sendMessage("");
-    sender.sendMessage("§eСистемные команды:");
-    sender.sendMessage("§f  reload§7, §frl§7 - Перезагрузить конфигурацию");
-    sender.sendMessage("§f  sync§7, §fsyn§7 - Синхронизировать с GitHub");
-    sender.sendMessage("§f  status§7, §fst§7 - Показать статус системы");
-    sender.sendMessage("§f  clear§7, §fclr§7 - Очистить кэш");
-    sender.sendMessage("§f  help§7, §fh§7 - Эта справка");
-    sender.sendMessage("");
-    sender.sendMessage("§eПримеры использования:");
-    sender.sendMessage("§7  plugindownloader i ViaVersion");
-    sender.sendMessage("§7  plugindownloader l");
-    sender.sendMessage("§7  plugindownloader st");
-    sender.sendMessage("§7  plugindownloader r ProtocolLib");
-}
+    private void showConsoleHelp(CommandSender sender) {
+        sender.sendMessage("§6=== PluginDownloader - Полная справка ===");
+        sender.sendMessage("§eОсновные команды:");
+        sender.sendMessage("§f  install§7, §fi§7 - Установить плагин");
+        sender.sendMessage("§f  list§7, §fl§7 - Показать список всех плагинов");
+        sender.sendMessage("§f  remove§7, §fr§7 - Удалить плагин");
+        sender.sendMessage("§f  info§7, §finf§7 - Информация о плагине");
+        sender.sendMessage("§f  search§7, §fs§7 - Поиск плагинов");
+        sender.sendMessage("");
+        sender.sendMessage("§eСистемные команды:");
+        sender.sendMessage("§f  reload§7, §frl§7 - Перезагрузить конфигурацию");
+        sender.sendMessage("§f  sync§7, §fsyn§7 - Синхронизировать с GitHub");
+        sender.sendMessage("§f  status§7, §fst§7 - Показать статус системы");
+        sender.sendMessage("§f  clear§7, §fclr§7 - Очистить кэш");
+        sender.sendMessage("§f  help§7, §fh§7 - Эта справка");
+        sender.sendMessage("");
+        sender.sendMessage("§eПримеры использования:");
+        sender.sendMessage("§7  plugindownloader i ViaVersion");
+        sender.sendMessage("§7  plugindownloader l");
+        sender.sendMessage("§7  plugindownloader st");
+        sender.sendMessage("§7  plugindownloader r ProtocolLib");
+    }
     
     private void showHelp(Player player, String label) {
         MessageUtils.sendMessage(player, "&6=== Помощь PluginDownloader ===");
@@ -531,7 +434,7 @@ private void showConsoleHelp(CommandSender sender) {
         MessageUtils.sendMessage(player, "&e/" + label + " инфо <плагин> &7- Информация о плагине");
         MessageUtils.sendMessage(player, "&e/" + label + " поиск <запрос> &7- Поиск плагинов");
         MessageUtils.sendMessage(player, "&e/" + label + " перезагрузить &7- Перезагрузить конфиг");
-        MessageUtils.sendMessage(player, "&e/" + label + " добавить <название> <ссылка> <описание> &7- Добавить кастомный плагин");
+        MessageUtils.sendMessage(player, "&e/" + label + " добавить <наз> <ссылка> <опис> &7- Добавить кастомный плагин");
         MessageUtils.sendMessage(player, "&e/" + label + " синхронизировать &7- Синхронизировать с GitHub");
         MessageUtils.sendMessage(player, "&e/магазинплагинов &7- Открыть магазин плагинов");
         MessageUtils.sendMessage(player, "&e/обновлениеплагинов &7- Проверить обновления");
