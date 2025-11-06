@@ -358,36 +358,31 @@ public class DownloadManager {
         }
     }
     
-    public void showConsolePluginInfo(CommandSender sender, String pluginName) {
-        FileConfiguration config = plugin.getConfigManager().getConfig();
-        YamlConfiguration sharedPlugins = plugin.getSyncManager().getSharedPlugins();
-        
-        String path = null;
-        FileConfiguration sourceConfig = null;
-        
-        // Ищем плагин в общих плагинах
-        if (sharedPlugins.contains("общие-плагины." + pluginName)) {
-            path = "общие-плагины." + pluginName + ".";
-            sourceConfig = sharedPlugins;
-            sender.sendMessage("§6Источник: §2Общие плагины (GitHub)");
-        }
-        // Ищем в основных плагинах
-        else if (config.contains("библиотека-плагинов." + pluginName)) {
-            path = "библиотека-плагины." + pluginName + ".";
-            sourceConfig = config;
-            sender.sendMessage("§6Источник: §6Основные плагины");
-        }
-        // Ищем в кастомных плагинах
-        else if (config.contains("кастомные-плагины." + pluginName)) {
-            path = "кастомные-плагины." + pluginName + ".";
-            sourceConfig = config;
-            sender.sendMessage("§6Источник: §eКастомные плагины");
-        }
-        
-        if (path == null) {
-            sender.sendMessage("§c[PluginDownloader] Плагин '" + pluginName + "' не найден");
-            return;
-        }
+public void showConsolePluginInfo(CommandSender sender, String pluginName) {
+    FileConfiguration config = plugin.getConfigManager().getConfig();
+    YamlConfiguration sharedPlugins = plugin.getSyncManager().getSharedPlugins();
+    
+    String path = null;
+    FileConfiguration sourceConfig = null; // 📍 ИСПРАВЛЕНО: YamlConfiguration → FileConfiguration
+    
+    // Ищем плагин в общих плагинах
+    if (sharedPlugins.contains("общие-плагины." + pluginName)) {
+        path = "общие-плагины." + pluginName + ".";
+        sourceConfig = sharedPlugins; // 📍 Теперь совместимо
+        sender.sendMessage("§6Источник: §2Общие плагины (GitHub)");
+    }
+    // Ищем в основных плагинах
+    else if (config.contains("библиотека-плагинов." + pluginName)) {
+        path = "библиотека-плагины." + pluginName + ".";
+        sourceConfig = config; // 📍 Теперь совместимо
+        sender.sendMessage("§6Источник: §6Основные плагины");
+    }
+    // Ищем в кастомных плагинах
+    else if (config.contains("кастомные-плагины." + pluginName)) {
+        path = "кастомные-плагины." + pluginName + ".";
+        sourceConfig = config; // 📍 Теперь совместимо
+        sender.sendMessage("§6Источник: §eКастомные плагины");
+    }
         
         String author = sourceConfig.getString(path + "автор");
         String version = sourceConfig.getString(path + "версия");
