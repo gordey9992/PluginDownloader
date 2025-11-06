@@ -42,7 +42,7 @@
     описание: "Голосовые сообщения в Minecraft, требует установки Simple Voice Chat. Требует мод на клиенте"
     ссылка: "https://hangarcdn.papermc.io/plugins/DimasKama/VoiceMessages/versions/paper-1.0.11/PAPER/voicemessages-paper-1.0.11.jar"
 
-  Simple Voice Chat:
+  SimpleVoiceChat:
     автор: "henkelmax"
     версия: "2.5.35"
     источник: "bukkit"
