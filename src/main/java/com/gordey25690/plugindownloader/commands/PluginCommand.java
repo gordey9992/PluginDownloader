@@ -299,41 +299,41 @@ public class PluginCommand implements CommandExecutor {
     
     // 📍 СПЕЦИАЛЬНЫЕ МЕТОДЫ ДЛЯ КОНСОЛИ
     private void showConsoleMainMenu(CommandSender sender) {
-        sender.sendMessage("§6╔══════════════════════════════════╗");
-        sender.sendMessage("§6║       §ePluginDownloader Console§6       ║");
-        sender.sendMessage("§6╠══════════════════════════════════╣");
-        sender.sendMessage("§6║ §eОсновные команды:§6                     ║");
-        sender.sendMessage("§6║ §fi <плагин>§7 - Установка              §6║");
-        sender.sendMessage("§6║ §fl§7 - Список плагинов                §6║");
-        sender.sendMessage("§6║ §fr <плагин>§7 - Удаление              §6║");
-        sender.sendMessage("§6║ §finf <плагин>§7 - Информация          §6║");
-        sender.sendMessage("§6║ §fs <запрос>§7 - Поиск                 §6║");
+        sender.sendMessage("§6╔════════════════════════════════════════╗");
+        sender.sendMessage("§6║      §ePluginDownloader Console      §6║");
+        sender.sendMessage("§6╠════════════════════════════════════════╣");
+        sender.sendMessage("§6║ §eОсновные команды:§6                  ║");
+        sender.sendMessage("§6║ §fi <плагин>§7 - Установка           §6║");
+        sender.sendMessage("§6║ §fl§7 - Список плагинов              §6║");
+        sender.sendMessage("§6║ §fr <плагин>§7 - Удаление            §6║");
+        sender.sendMessage("§6║ §finf <плагин>§7 - Информация        §6║");
+        sender.sendMessage("§6║ §fs <запрос>§7 - Поиск               §6║");
         sender.sendMessage("§6║                                      §6║");
-        sender.sendMessage("§6║ §eСистемные команды:§6                   ║");
-        sender.sendMessage("§6║ §frl§7 - Перезагрузка конфигов        §6║");
+        sender.sendMessage("§6║ §eСистемные команды:§6                 ║");
+        sender.sendMessage("§6║ §frl§7 - Перезагрузка конфигов       §6║");
         sender.sendMessage("§6║ §fsyn§7 - Синхронизация с GitHub     §6║");
         sender.sendMessage("§6║ §fst§7 - Статус системы              §6║");
         sender.sendMessage("§6║ §fclr§7 - Очистка кэша               §6║");
         sender.sendMessage("§6║ §fh§7 - Полная справка              §6║");
-        sender.sendMessage("§6╚══════════════════════════════════╝");
+        sender.sendMessage("§6╚═══════════════════════════════════════╝");
     }
     
     private void showConsoleInstallMenu(CommandSender sender) {
-        sender.sendMessage("§6╔══════════════════════════════════╗");
+        sender.sendMessage("§6╔════════════════════════════════════════╗");
         sender.sendMessage("§6║         §eУстановка плагинов§6         ║");
-        sender.sendMessage("§6╠══════════════════════════════════╣");
-        sender.sendMessage("§6║ §fДоступные плагины:§6                   ║");
-        
+        sender.sendMessage("§6╠════════════════════════════════════════╣");
+        sender.sendMessage("§6║ §fДоступные плагины:§6                 ║");
+   
         // Показываем популярные плагины для быстрой установки
-        sender.sendMessage("§6║ §aViaVersion§7 - поддержка версий     §6║");
-        sender.sendMessage("§6║ §aProtocolLib§7 - работа с пакетами   §6║");
-        sender.sendMessage("§6║ §aWorldEdit§7 - редактор карт         §6║");
-        sender.sendMessage("§6║ §aLuckPerms§7 - система прав          §6║");
+        sender.sendMessage("§6║ §aViaVersion§7 - поддержка версий    §6║");
+        sender.sendMessage("§6║ §aProtocolLib§7 - работа с пакетами  §6║");
+        sender.sendMessage("§6║ §aWorldEdit§7 - редактор карт        §6║");
+        sender.sendMessage("§6║ §aLuckPerms§7 - система прав         §6║");
         sender.sendMessage("§6║                                      §6║");
         sender.sendMessage("§6║ §eИспользование:§6                     ║");
         sender.sendMessage("§6║ §fplugindownloader i <name>§6          ║");
         sender.sendMessage("§6║ §fПример: i ViaVersion§6               ║");
-        sender.sendMessage("§6╚══════════════════════════════════╝");
+        sender.sendMessage("§6╚════════════════════════════════════════╝");
     }
     
     private void handleConsoleInstall(CommandSender sender, String pluginName) {
@@ -365,19 +365,19 @@ public class PluginCommand implements CommandExecutor {
     }
     
     private void handleConsoleStatus(CommandSender sender) {
-        sender.sendMessage("§6╔══════════════════════════════════╗");
-        sender.sendMessage("§6║         §eСтатус системы§6            ║");
-        sender.sendMessage("§6╠══════════════════════════════════╣");
+        sender.sendMessage("§6╔════════════════════════════════════════╗");
+        sender.sendMessage("§6║         §eСтатус системы§6             ║");
+        sender.sendMessage("§6╠════════════════════════════════════════╣");
         sender.sendMessage("§6║ §fВерсия плагина:§7 " + plugin.getDescription().getVersion() + "§6           ║");
         sender.sendMessage("§6║ §fСинхронизация:§7 " + 
             (plugin.getSyncManager().isSyncEnabled() ? "§aВключена" : "§cВыключена") + "§6         ║");
-        sender.sendMessage("§6║ §fПоследняя синхронизация:§7 " + 
-            getLastSyncTimeFormatted() + "§6 ║");
-        sender.sendMessage("§6║ §fОбщих плагинов:§7 " + 
-            downloadManager.getSharedPluginsCount() + "§6              ║");
-        sender.sendMessage("§6║ §fОсновных плагинов:§7 " + 
-            downloadManager.getMainPluginsCount() + "§6               ║");
-        sender.sendMessage("§6╚══════════════════════════════════╝");
+        sender.sendMessage("§6║ §fПоследняя синхронизация:§7 " +       ║");
+            getLastSyncTimeFormatted() + "                           §6║");
+        sender.sendMessage("§6║ §fОбщих плагинов:§7 " +                ║");
+            downloadManager.getSharedPluginsCount() + "              §6║");
+        sender.sendMessage("§6║ §fОсновных плагинов:§7 " +             ║");
+            downloadManager.getMainPluginsCount() + "                §6║");
+        sender.sendMessage("§6╚════════════════════════════════════════╝");
     }
     
     private void handleConsoleClear(CommandSender sender) {
