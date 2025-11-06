@@ -1,56 +1,56 @@
 name: PluginDownloader
-version: 1.2.2
+version: 1.0.0
 main: com.gordey25690.plugindownloader.PluginDownloader
 api-version: "1.21"
-author: gordey25690 & DeepSeek
-description: Скачивание и управление плагинами прямо в игре
+authors: [gordey25690, DeepSeek]
+description: Плагин для загрузки и управления другими плагинами
 website: https://github.com/gordey9992
+
 commands:
   plugindownloader:
-    description: Основная команда для загрузки плагинов
-    usage: /<command> <install|list|remove|update|reload|info|search>
-    aliases: [pdl, plugins, управлениеплагинами, пд, plugindl, pdownload, pd]
+    description: Основная команда плагина
+    usage: /<command> <install|list|remove|update|info|search|reload|sync>
+    aliases: [пдл, плагины, pdl]
   магазинплагинов:
-    description: Просмотр доступных плагинов
+    description: Открыть магазин плагинов
     usage: /<command> [поиск]
-    aliases: [мп, магазин]
+    aliases: [мп, pluginmarket]
   обновлениеплагинов:
-    description: Проверка обновлений плагинов
-    usage: /<command> [все|название_плагина]
-    aliases: [оп, обновить]
+    description: Проверить обновления плагинов
+    usage: /<command> [все|плагин]
+    aliases: [оп, pluginupdate]
+
 permissions:
   plugindownloader.*:
-    description: Все разрешения для PluginDownloader
+    description: Все разрешения плагина
     children:
       plugindownloader.use: true
       plugindownloader.install: true
       plugindownloader.remove: true
       plugindownloader.update: true
       plugindownloader.reload: true
-      plugindownloader.manage: true
-      plugindownloader.shop: true
-      plugindownloader.info: true
+      plugindownloader.sync: true
+  
   plugindownloader.use:
-    description: Использование PluginDownloader
+    description: Основное разрешение на использование
     default: op
+  
   plugindownloader.install:
     description: Установка плагинов
     default: op
+  
   plugindownloader.remove:
     description: Удаление плагинов
     default: op
+  
   plugindownloader.update:
     description: Обновление плагинов
     default: op
+  
   plugindownloader.reload:
     description: Перезагрузка конфигурации
     default: op
-  plugindownloader.manage:
-    description: Управление плагинами
-    default: op
-  plugindownloader.shop:
-    description: Доступ к магазину плагинов
-    default: op
-  plugindownloader.info:
-    description: Просмотр информации о плагинах
+  
+  plugindownloader.sync:
+    description: Синхронизация плагинов
     default: op
