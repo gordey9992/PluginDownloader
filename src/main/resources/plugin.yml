@@ -8,8 +8,8 @@ website: https://github.com/gordey9992
 commands:
   plugindownloader:
     description: Основная команда для загрузки плагинов
-    usage: /<command> <установить|список|удалить|обновить|перезагрузить|инфо|поиск>
-    aliases: [пдл, плагины, управлениеплагинами]
+    usage: /<command> <install|list|remove|update|reload|info|search>
+    aliases: [pdl, plugins, управлениеплагинами, пд, plugindl, pdownload, pd]
   магазинплагинов:
     description: Просмотр доступных плагинов
     usage: /<command> [поиск]
