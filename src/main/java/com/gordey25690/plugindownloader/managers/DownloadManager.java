@@ -515,4 +515,27 @@ public void showConsolePluginInfo(CommandSender sender, String pluginName) {
     public void addCustomPlugin(Player player, String pluginName, String url, String description) {
         // ... существующий код
     }
+    
+private void showConsolePluginInfoLine(CommandSender sender, String pluginName, YamlConfiguration sharedPlugins) {
+    String path = "общие-плагины." + pluginName + ".";
+    
+    String description = sharedPlugins.getString(path + "описание");
+    String version = sharedPlugins.getString(path + "версия");
+    String source = sharedPlugins.getString(path + "источник", "github"); // 📍 Берем источник
+    
+    File pluginFile = new File(pluginsFolder, pluginName + ".jar");
+    String status = pluginFile.exists() ? "§a[УСТ]" : "§7[---]";
+    
+    // 📍 ОПРЕДЕЛЯЕМ ИКОНКУ ПО ИСТОЧНИКУ
+    String sourceIcon = "🌐"; // GitHub по умолчанию
+    if ("modrinth".equalsIgnoreCase(source)) {
+        sourceIcon = "🟢"; // Modrinth
+    } else if ("hangar".equalsIgnoreCase(source)) {
+        sourceIcon = "🔵"; // Hangar
+    } else if ("прямая-ссылка".equalsIgnoreCase(source)) {
+        sourceIcon = "🔗"; // Прямая ссылка
+    }
+    
+    sender.sendMessage("  " + status + " " + sourceIcon + " §a" + pluginName + " §7v" + version + " - §f" + description);
+}
 }
