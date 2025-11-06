@@ -48,11 +48,4 @@
     источник: "bukkit"
     описание: "Голосовой чат в Minecraft. Требует мод на клиенте"
     ссылка: "https://dev.bukkit.org/projects/simple-voice-chat/files/6787262/download"
-
-  SandstormDungeon:
-    автор: "gordey25690"
-    версия: "1.0.0"
-    источник: "github"
-    описание: "Песчанные бури в пустыне, скользящие блоки при буре и новые данжи"
-    ссылка: "https://github.com/gordey9992/SandstormDungeon/releases/download/v1.0.0/SandstormDungeon-1.0.0.jar"
-
+    
