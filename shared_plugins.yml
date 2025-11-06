@@ -48,4 +48,11 @@
     источник: "bukkit"
     описание: "Голосовой чат в Minecraft. Требует мод на клиенте"
     ссылка: "https://dev.bukkit.org/projects/simple-voice-chat/files/6787262/download"
+
+   fff:
+    автор: "henkelmax"
+    версия: "2.5.35"
+    источник: "bukkit"
+    описание: "Голосовой чат в Minecraft. Требует мод на клиенте"
+    ссылка: "https://bukkit.net/mods/clientchat/download"
     
