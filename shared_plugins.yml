@@ -4,8 +4,15 @@
     автор: "ViaVersion"
     версия: "5.5.2-SNAPSHOT"
     источник: "hangar"
-    описание: "Поддержка разных версий Minecraft"
+    описание: "Поддержка версий которые выше чем ядро"
     ссылка: "https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.5.2-SNAPSHOT%2B859/PAPER/ViaVersion-5.5.2-SNAPSHOT.jar"
+  
+  ViaBackwards:
+    автор: "Kennytv, creeper123123321, FlorianMichael"
+    версия: "5.7.0"
+    источник: "modrinth"
+    описание: "Поддержка версий которые ниже чем ядро"
+    ссылка: "https://cdn.modrinth.com/data/NpvuJQoq/versions/NpMUcgVK/ViaBackwards-5.7.0.jar"
     
   ProtocolLib:
     автор: "dmulloy2"
